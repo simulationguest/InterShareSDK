@@ -1,9 +1,0 @@
-[bindings.kotlin]
-package_name = "com.julian_baumann.data_rct"
-cdylib_name = "data_rct_ffi"
-android = true
-android_cleaner = true
-
-[bindings.csharp]
-cdylib_name = "data_rct_ffi"
-namespace = "DataRct"

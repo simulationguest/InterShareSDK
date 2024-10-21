@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRct", "bindings\csharp\DataRct\DataRct.csproj", "{ABCDEF4E-2EEE-4B66-9DA6-A9F737D09E59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterShareSDK", "bindings\csharp\InterShareSDK\InterShareSDK.csproj", "{ABCDEF4E-2EEE-4B66-9DA6-A9F737D09E59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

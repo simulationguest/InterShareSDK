@@ -2,12 +2,10 @@
 <module type="EMPTY_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/data_rct/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/data_rct/tests" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/data_rct_ffi/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/ble/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/intershare_sdk/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/intershare_sdk/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/intershare_sdk_ffi/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/protocol/src" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/src/data_rct_ffi/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

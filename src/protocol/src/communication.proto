@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package DataRCT.communication;
+package InterShareSDK.communication;
 import "discovery.proto";
 
 message EncryptionRequest {

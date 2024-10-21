@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package DataRCT.discovery;
+package InterShareSDK.discovery;
 
 message DeviceDiscoveryMessage {
     oneof content {

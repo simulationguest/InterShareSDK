@@ -4,32 +4,32 @@
 import PackageDescription
 
 let package = Package(
-    name: "DataRCT",
+    name: "InterShareKit",
     platforms: [
         .iOS(.v15),
         .macOS(.v12)
     ],
     products: [
         .library(
-            name: "DataRCT",
-            targets: ["DataRCT"]),
+            name: "InterShareKit",
+            targets: ["InterShareKit"]),
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "DataRCT",
-            dependencies: ["DataRCTFFI"],
+            name: "InterShareKit",
+            dependencies: ["InterShareSDKFFI"],
             path: "./bindings/swift/Sources"
         ),
 
         .binaryTarget(
-            name: "DataRCTFFI",
-            path: "./bindings/swift/DataRCTFFI.xcframework"
+            name: "InterShareSDKFFI",
+            path: "./bindings/swift/InterShareSDKFFI.xcframework"
         ),
 
         .testTarget(
-            name: "DataRCTTests",
-            dependencies: ["DataRCT"],
+            name: "InterShareSDKTests",
+            dependencies: ["InterShareKit"],
             path: "./bindings/swift/Tests"
         ),
     ]

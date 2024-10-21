@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-FFI_PROJECT="src/data_rct_ffi/Cargo.toml"
+FFI_PROJECT="src/intershare_sdk_ffi/Cargo.toml"
 
 # Colors
 CYAN="\e[36m"
@@ -39,13 +39,13 @@ function GenerateUniffiBindings()
 {
     PrintInfo "Generating bindings"
     cargo build --release
-    cargo run --bin uniffi-bindgen generate --library target/release/libdata_rct_ffi.a --language swift --out-dir "bindings/swift/Sources/DataRCT"
-    # cargo run --bin uniffi-bindgen generate "src/data_rct_ffi/src/data_rct.udl" --language swift --out-dir "bindings/swift/Sources/DataRCT"
+    cargo run --bin uniffi-bindgen generate --library target/release/libintershare_sdk_ffi.a --language swift --out-dir "bindings/swift/Sources/InterShareKit"
+    # cargo run --bin uniffi-bindgen generate "src/intershare_sdk_ffi/src/intershare_sdk.udl" --language swift --out-dir "bindings/swift/Sources/InterShareSDK"
     CheckForErrorAndExitIfNecessary
 
     pushd bindings/swift
-        mv Sources/DataRCT/*.h .out/headers/
-        mv Sources/DataRCT/*.modulemap .out/headers/module.modulemap
+        mv Sources/InterShareKit/*.h .out/headers/
+        mv Sources/InterShareKit/*.modulemap .out/headers/module.modulemap
     popd
 
     PrintDone
@@ -62,15 +62,15 @@ function CreateUniversalBinary()
     if [ -z "$SecondArchitecture" ]
     then
         lipo -create \
-          "target/$FirstArchitecture/release/libdata_rct_ffi.a" \
-          -output "bindings/swift/.out/$Target/libdata_rct_ffi.a"
+          "target/$FirstArchitecture/release/libintershare_sdk_ffi.a" \
+          -output "bindings/swift/.out/$Target/libintershare_sdk_ffi.a"
 
         CheckForErrorAndExitIfNecessary
     else
         lipo -create \
-          "target/$FirstArchitecture/release/libdata_rct_ffi.a" \
-          "target/$SecondArchitecture/release/libdata_rct_ffi.a" \
-          -output "bindings/swift/.out/$Target/libdata_rct_ffi.a"
+          "target/$FirstArchitecture/release/libintershare_sdk_ffi.a" \
+          "target/$SecondArchitecture/release/libintershare_sdk_ffi.a" \
+          -output "bindings/swift/.out/$Target/libintershare_sdk_ffi.a"
 
         CheckForErrorAndExitIfNecessary
     fi
@@ -82,16 +82,16 @@ function GenerateXcFramework()
 {
     PrintInfo "Generating xc-framework"
 
-    rm -rf bindings/swift/DataRCTFFI.xcframework
+    rm -rf bindings/swift/InterShareSDKFFI.xcframework
 
     xcodebuild -create-xcframework \
-      -library bindings/swift/.out/macos/libdata_rct_ffi.a \
+      -library bindings/swift/.out/macos/libintershare_sdk_ffi.a \
       -headers bindings/swift/.out/headers/ \
-      -library bindings/swift/.out/ios/libdata_rct_ffi.a \
+      -library bindings/swift/.out/ios/libintershare_sdk_ffi.a \
       -headers bindings/swift/.out/headers/ \
-      -library bindings/swift/.out/ios-simulator/libdata_rct_ffi.a \
+      -library bindings/swift/.out/ios-simulator/libintershare_sdk_ffi.a \
       -headers bindings/swift/.out/headers/ \
-      -output bindings/swift/DataRCTFFI.xcframework
+      -output bindings/swift/InterShareSDKFFI.xcframework
 
     CheckForErrorAndExitIfNecessary
     PrintDone
@@ -127,6 +127,6 @@ CreateUniversalBinary "ios-simulator" "x86_64-apple-ios" "aarch64-apple-ios-sim"
 
 GenerateXcFramework
 
-#zip -r DataRCTFFI.xcframework.zip DataRCTFFI.xcframework
+#zip -r InterShareSDKFFI.xcframework.zip InterShareSDKFFI.xcframework
 
 rm -rf bindings/swift/.out

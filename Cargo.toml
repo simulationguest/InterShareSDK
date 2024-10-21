@@ -2,7 +2,7 @@
 resolver = "2"
 
 members = [
-    "src/data_rct",
-    "src/data_rct_ffi",
+    "src/intershare_sdk",
+    "src/intershare_sdk_ffi",
     "src/protocol"
 ]

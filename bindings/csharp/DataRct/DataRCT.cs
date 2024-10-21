@@ -11,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace DataRct;
+namespace InterShareSDK;
 
 // This is a helper for safely working with byte buffers returned from the Rust code.
 // A rust-owned buffer is represented by its capacity, its current length, and a
@@ -29,7 +29,7 @@ internal struct RustBuffer
         return _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                var buffer = _UniFFILib.ffi_data_rct_ffi_rustbuffer_alloc(size, ref status);
+                var buffer = _UniFFILib.ffi_intershare_sdk_ffi_rustbuffer_alloc(size, ref status);
                 if (buffer.data == IntPtr.Zero)
                 {
                     throw new AllocationException(
@@ -46,7 +46,7 @@ internal struct RustBuffer
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.ffi_data_rct_ffi_rustbuffer_free(buffer, ref status);
+                _UniFFILib.ffi_intershare_sdk_ffi_rustbuffer_free(buffer, ref status);
             }
         );
     }
@@ -557,152 +557,152 @@ static class _UniFFILib
         FfiConverterTypeSendProgressDelegate.INSTANCE.Register();
     }
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_free_connectionrequest(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_free_connectionrequest(
         IntPtr ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_connectionrequest_accept(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_connectionrequest_accept(
         ConnectionRequestSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_connectionrequest_decline(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_connectionrequest_decline(
         ConnectionRequestSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer uniffi_data_rct_ffi_fn_method_connectionrequest_get_clipboard_intent(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_clipboard_intent(
         ConnectionRequestSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer uniffi_data_rct_ffi_fn_method_connectionrequest_get_file_transfer_intent(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_file_transfer_intent(
         ConnectionRequestSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer uniffi_data_rct_ffi_fn_method_connectionrequest_get_intent_type(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_intent_type(
         ConnectionRequestSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer uniffi_data_rct_ffi_fn_method_connectionrequest_get_sender(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_sender(
         ConnectionRequestSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_connectionrequest_set_progress_delegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_connectionrequest_set_progress_delegate(
         ConnectionRequestSafeHandle @ptr,
         ulong @delegate,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_free_internaldiscovery(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_free_internaldiscovery(
         IntPtr ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern InternalDiscoverySafeHandle uniffi_data_rct_ffi_fn_constructor_internaldiscovery_new(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern InternalDiscoverySafeHandle uniffi_intershare_sdk_ffi_fn_constructor_internaldiscovery_new(
         RustBuffer @delegate,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internaldiscovery_add_ble_implementation(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_add_ble_implementation(
         InternalDiscoverySafeHandle @ptr,
         ulong @implementation,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internaldiscovery_parse_discovery_message(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_parse_discovery_message(
         InternalDiscoverySafeHandle @ptr,
         RustBuffer @data,
         RustBuffer @bleUuid,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internaldiscovery_start(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_start(
         InternalDiscoverySafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internaldiscovery_stop(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_stop(
         InternalDiscoverySafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_free_internalnearbyserver(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_free_internalnearbyserver(
         IntPtr ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern InternalNearbyServerSafeHandle uniffi_data_rct_ffi_fn_constructor_internalnearbyserver_new(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern InternalNearbyServerSafeHandle uniffi_intershare_sdk_ffi_fn_constructor_internalnearbyserver_new(
         RustBuffer @myDevice,
         RustBuffer @fileStorage,
         ulong @delegate,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_add_ble_implementation(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_add_ble_implementation(
         InternalNearbyServerSafeHandle @ptr,
         ulong @bleImplementation,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_add_l2_cap_client(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_add_l2_cap_client(
         InternalNearbyServerSafeHandle @ptr,
         ulong @delegate,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_change_device(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_change_device(
         InternalNearbyServerSafeHandle @ptr,
         RustBuffer @newDevice,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer uniffi_data_rct_ffi_fn_method_internalnearbyserver_get_advertisement_data(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_get_advertisement_data(
         InternalNearbyServerSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_handle_incoming_ble_connection(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_handle_incoming_ble_connection(
         InternalNearbyServerSafeHandle @ptr,
         RustBuffer @connectionId,
         ulong @nativeStream,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_handle_incoming_connection(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_handle_incoming_connection(
         InternalNearbyServerSafeHandle @ptr,
         ulong @nativeStreamHandle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_send_file(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_send_file(
         InternalNearbyServerSafeHandle @ptr,
         RustBuffer @receiver,
         RustBuffer @filePath,
@@ -710,484 +710,484 @@ static class _UniFFILib
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_set_ble_connection_details(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_set_ble_connection_details(
         InternalNearbyServerSafeHandle @ptr,
         RustBuffer @bleDetails,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_set_tcp_details(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_set_tcp_details(
         InternalNearbyServerSafeHandle @ptr,
         RustBuffer @tcpDetails,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_start(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_start(
         InternalNearbyServerSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_method_internalnearbyserver_stop(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_stop(
         InternalNearbyServerSafeHandle @ptr,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_blediscoveryimplementationdelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_blediscoveryimplementationdelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_bleserverimplementationdelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_bleserverimplementationdelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_devicelistupdatedelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_devicelistupdatedelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_l2capdelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_l2capdelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_nativestreamdelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_nativestreamdelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_nearbyconnectiondelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_nearbyconnectiondelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_receiveprogressdelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_receiveprogressdelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void uniffi_data_rct_ffi_fn_init_callback_sendprogressdelegate(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void uniffi_intershare_sdk_ffi_fn_init_callback_sendprogressdelegate(
         ForeignCallback @callbackStub,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer uniffi_data_rct_ffi_fn_func_get_ble_characteristic_uuid(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer uniffi_intershare_sdk_ffi_fn_func_get_ble_characteristic_uuid(
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer uniffi_data_rct_ffi_fn_func_get_ble_service_uuid(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer uniffi_intershare_sdk_ffi_fn_func_get_ble_service_uuid(
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer ffi_data_rct_ffi_rustbuffer_alloc(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer ffi_intershare_sdk_ffi_rustbuffer_alloc(
         int @size,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer ffi_data_rct_ffi_rustbuffer_from_bytes(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer ffi_intershare_sdk_ffi_rustbuffer_from_bytes(
         ForeignBytes @bytes,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rustbuffer_free(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rustbuffer_free(
         RustBuffer @buf,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer ffi_data_rct_ffi_rustbuffer_reserve(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer ffi_intershare_sdk_ffi_rustbuffer_reserve(
         RustBuffer @buf,
         int @additional,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_continuation_callback_set(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_continuation_callback_set(
         IntPtr @callback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_u8(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_u8(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_u8(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_u8(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_u8(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_u8(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern byte ffi_data_rct_ffi_rust_future_complete_u8(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern byte ffi_intershare_sdk_ffi_rust_future_complete_u8(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_i8(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_i8(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_i8(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_i8(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_i8(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_i8(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern sbyte ffi_data_rct_ffi_rust_future_complete_i8(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern sbyte ffi_intershare_sdk_ffi_rust_future_complete_i8(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_u16(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_u16(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_u16(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_u16(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_u16(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_u16(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort ffi_data_rct_ffi_rust_future_complete_u16(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort ffi_intershare_sdk_ffi_rust_future_complete_u16(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_i16(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_i16(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_i16(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_i16(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_i16(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_i16(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern short ffi_data_rct_ffi_rust_future_complete_i16(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern short ffi_intershare_sdk_ffi_rust_future_complete_i16(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_u32(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_u32(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_u32(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_u32(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_u32(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_u32(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern uint ffi_data_rct_ffi_rust_future_complete_u32(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern uint ffi_intershare_sdk_ffi_rust_future_complete_u32(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_i32(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_i32(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_i32(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_i32(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_i32(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_i32(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern int ffi_data_rct_ffi_rust_future_complete_i32(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern int ffi_intershare_sdk_ffi_rust_future_complete_i32(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_u64(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_u64(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_u64(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_u64(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_u64(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_u64(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern ulong ffi_data_rct_ffi_rust_future_complete_u64(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ulong ffi_intershare_sdk_ffi_rust_future_complete_u64(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_i64(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_i64(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_i64(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_i64(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_i64(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_i64(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern long ffi_data_rct_ffi_rust_future_complete_i64(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern long ffi_intershare_sdk_ffi_rust_future_complete_i64(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_f32(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_f32(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_f32(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_f32(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_f32(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_f32(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern float ffi_data_rct_ffi_rust_future_complete_f32(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern float ffi_intershare_sdk_ffi_rust_future_complete_f32(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_f64(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_f64(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_f64(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_f64(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_f64(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_f64(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern double ffi_data_rct_ffi_rust_future_complete_f64(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern double ffi_intershare_sdk_ffi_rust_future_complete_f64(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_pointer(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_pointer(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_pointer(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_pointer(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_pointer(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_pointer(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern SafeHandle ffi_data_rct_ffi_rust_future_complete_pointer(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern SafeHandle ffi_intershare_sdk_ffi_rust_future_complete_pointer(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_rust_buffer(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_rust_buffer(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_rust_buffer(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_rust_buffer(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_rust_buffer(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_rust_buffer(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern RustBuffer ffi_data_rct_ffi_rust_future_complete_rust_buffer(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern RustBuffer ffi_intershare_sdk_ffi_rust_future_complete_rust_buffer(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_poll_void(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_poll_void(
         IntPtr @handle,
         IntPtr @uniffiCallback
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_cancel_void(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_cancel_void(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_free_void(IntPtr @handle);
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_free_void(IntPtr @handle);
 
-    [DllImport("data_rct_ffi")]
-    public static extern void ffi_data_rct_ffi_rust_future_complete_void(
+    [DllImport("intershare_sdk_ffi")]
+    public static extern void ffi_intershare_sdk_ffi_rust_future_complete_void(
         IntPtr @handle,
         ref RustCallStatus _uniffi_out_err
     );
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_func_get_ble_characteristic_uuid();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_func_get_ble_characteristic_uuid();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_func_get_ble_service_uuid();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_func_get_ble_service_uuid();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_connectionrequest_accept();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_accept();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_connectionrequest_decline();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_decline();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_connectionrequest_get_clipboard_intent();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_clipboard_intent();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_connectionrequest_get_file_transfer_intent();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_file_transfer_intent();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_connectionrequest_get_intent_type();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_intent_type();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_connectionrequest_get_sender();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_sender();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_connectionrequest_set_progress_delegate();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_set_progress_delegate();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internaldiscovery_add_ble_implementation();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_add_ble_implementation();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internaldiscovery_parse_discovery_message();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_parse_discovery_message();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internaldiscovery_start();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_start();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internaldiscovery_stop();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_stop();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_add_ble_implementation();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_add_ble_implementation();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_add_l2_cap_client();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_add_l2_cap_client();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_change_device();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_change_device();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_get_advertisement_data();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_get_advertisement_data();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_handle_incoming_ble_connection();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_handle_incoming_ble_connection();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_handle_incoming_connection();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_handle_incoming_connection();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_send_file();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_send_file();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_set_ble_connection_details();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_set_ble_connection_details();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_set_tcp_details();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_set_tcp_details();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_start();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_start();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_internalnearbyserver_stop();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_stop();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_constructor_internaldiscovery_new();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_constructor_internaldiscovery_new();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_constructor_internalnearbyserver_new();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_constructor_internalnearbyserver_new();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_blediscoveryimplementationdelegate_start_scanning();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_blediscoveryimplementationdelegate_start_scanning();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_blediscoveryimplementationdelegate_stop_scanning();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_blediscoveryimplementationdelegate_stop_scanning();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_bleserverimplementationdelegate_start_server();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_bleserverimplementationdelegate_start_server();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_bleserverimplementationdelegate_stop_server();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_bleserverimplementationdelegate_stop_server();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_devicelistupdatedelegate_device_added();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_devicelistupdatedelegate_device_added();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_devicelistupdatedelegate_device_removed();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_devicelistupdatedelegate_device_removed();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_l2capdelegate_open_l2cap_connection();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_l2capdelegate_open_l2cap_connection();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_write();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_write();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_read();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_read();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_flush();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_flush();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_disconnect();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_disconnect();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_nearbyconnectiondelegate_received_connection_request();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_nearbyconnectiondelegate_received_connection_request();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_receiveprogressdelegate_progress_changed();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_receiveprogressdelegate_progress_changed();
 
-    [DllImport("data_rct_ffi")]
-    public static extern ushort uniffi_data_rct_ffi_checksum_method_sendprogressdelegate_progress_changed();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern ushort uniffi_intershare_sdk_ffi_checksum_method_sendprogressdelegate_progress_changed();
 
-    [DllImport("data_rct_ffi")]
-    public static extern uint ffi_data_rct_ffi_uniffi_contract_version();
+    [DllImport("intershare_sdk_ffi")]
+    public static extern uint ffi_intershare_sdk_ffi_uniffi_contract_version();
 
     static void uniffiCheckContractApiVersion()
     {
-        var scaffolding_contract_version = _UniFFILib.ffi_data_rct_ffi_uniffi_contract_version();
+        var scaffolding_contract_version = _UniFFILib.ffi_intershare_sdk_ffi_uniffi_contract_version();
         if (24 != scaffolding_contract_version)
         {
             throw new UniffiContractVersionException(
-                $"DataRct: uniffi bindings expected version `24`, library returned `{scaffolding_contract_version}`"
+                $"InterShareSDK: uniffi bindings expected version `24`, library returned `{scaffolding_contract_version}`"
             );
         }
     }
@@ -1196,398 +1196,398 @@ static class _UniFFILib
     {
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_func_get_ble_characteristic_uuid();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_func_get_ble_characteristic_uuid();
             if (checksum != 53557)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_func_get_ble_characteristic_uuid` checksum `53557`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_func_get_ble_characteristic_uuid` checksum `53557`, library returned `{checksum}`"
                 );
             }
         }
         {
-            var checksum = _UniFFILib.uniffi_data_rct_ffi_checksum_func_get_ble_service_uuid();
+            var checksum = _UniFFILib.uniffi_intershare_sdk_ffi_checksum_func_get_ble_service_uuid();
             if (checksum != 26941)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_func_get_ble_service_uuid` checksum `26941`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_func_get_ble_service_uuid` checksum `26941`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_connectionrequest_accept();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_accept();
             if (checksum != 65071)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_connectionrequest_accept` checksum `65071`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_accept` checksum `65071`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_connectionrequest_decline();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_decline();
             if (checksum != 22570)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_connectionrequest_decline` checksum `22570`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_decline` checksum `22570`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_connectionrequest_get_clipboard_intent();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_clipboard_intent();
             if (checksum != 19258)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_connectionrequest_get_clipboard_intent` checksum `19258`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_clipboard_intent` checksum `19258`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_connectionrequest_get_file_transfer_intent();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_file_transfer_intent();
             if (checksum != 24525)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_connectionrequest_get_file_transfer_intent` checksum `24525`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_file_transfer_intent` checksum `24525`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_connectionrequest_get_intent_type();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_intent_type();
             if (checksum != 40154)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_connectionrequest_get_intent_type` checksum `40154`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_intent_type` checksum `40154`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_connectionrequest_get_sender();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_sender();
             if (checksum != 12048)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_connectionrequest_get_sender` checksum `12048`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_get_sender` checksum `12048`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_connectionrequest_set_progress_delegate();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_set_progress_delegate();
             if (checksum != 35389)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_connectionrequest_set_progress_delegate` checksum `35389`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_set_progress_delegate` checksum `35389`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internaldiscovery_add_ble_implementation();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_add_ble_implementation();
             if (checksum != 64333)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internaldiscovery_add_ble_implementation` checksum `64333`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_add_ble_implementation` checksum `64333`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internaldiscovery_parse_discovery_message();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_parse_discovery_message();
             if (checksum != 24188)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internaldiscovery_parse_discovery_message` checksum `24188`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_parse_discovery_message` checksum `24188`, library returned `{checksum}`"
                 );
             }
         }
         {
-            var checksum = _UniFFILib.uniffi_data_rct_ffi_checksum_method_internaldiscovery_start();
+            var checksum = _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_start();
             if (checksum != 50475)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internaldiscovery_start` checksum `50475`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_start` checksum `50475`, library returned `{checksum}`"
                 );
             }
         }
         {
-            var checksum = _UniFFILib.uniffi_data_rct_ffi_checksum_method_internaldiscovery_stop();
+            var checksum = _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_stop();
             if (checksum != 51582)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internaldiscovery_stop` checksum `51582`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internaldiscovery_stop` checksum `51582`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_add_ble_implementation();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_add_ble_implementation();
             if (checksum != 61314)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_add_ble_implementation` checksum `61314`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_add_ble_implementation` checksum `61314`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_add_l2_cap_client();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_add_l2_cap_client();
             if (checksum != 53820)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_add_l2_cap_client` checksum `53820`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_add_l2_cap_client` checksum `53820`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_change_device();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_change_device();
             if (checksum != 171)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_change_device` checksum `171`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_change_device` checksum `171`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_get_advertisement_data();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_get_advertisement_data();
             if (checksum != 34600)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_get_advertisement_data` checksum `34600`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_get_advertisement_data` checksum `34600`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_handle_incoming_ble_connection();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_handle_incoming_ble_connection();
             if (checksum != 23416)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_handle_incoming_ble_connection` checksum `23416`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_handle_incoming_ble_connection` checksum `23416`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_handle_incoming_connection();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_handle_incoming_connection();
             if (checksum != 57237)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_handle_incoming_connection` checksum `57237`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_handle_incoming_connection` checksum `57237`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_send_file();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_send_file();
             if (checksum != 63319)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_send_file` checksum `63319`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_send_file` checksum `63319`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_set_ble_connection_details();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_set_ble_connection_details();
             if (checksum != 50394)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_set_ble_connection_details` checksum `50394`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_set_ble_connection_details` checksum `50394`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_set_tcp_details();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_set_tcp_details();
             if (checksum != 8748)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_set_tcp_details` checksum `8748`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_set_tcp_details` checksum `8748`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_start();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_start();
             if (checksum != 39930)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_start` checksum `39930`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_start` checksum `39930`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_internalnearbyserver_stop();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_stop();
             if (checksum != 39757)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_internalnearbyserver_stop` checksum `39757`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_stop` checksum `39757`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_constructor_internaldiscovery_new();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_constructor_internaldiscovery_new();
             if (checksum != 54735)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_constructor_internaldiscovery_new` checksum `54735`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_constructor_internaldiscovery_new` checksum `54735`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_constructor_internalnearbyserver_new();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_constructor_internalnearbyserver_new();
             if (checksum != 6844)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_constructor_internalnearbyserver_new` checksum `6844`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_constructor_internalnearbyserver_new` checksum `6844`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_blediscoveryimplementationdelegate_start_scanning();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_blediscoveryimplementationdelegate_start_scanning();
             if (checksum != 20220)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_blediscoveryimplementationdelegate_start_scanning` checksum `20220`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_blediscoveryimplementationdelegate_start_scanning` checksum `20220`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_blediscoveryimplementationdelegate_stop_scanning();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_blediscoveryimplementationdelegate_stop_scanning();
             if (checksum != 49638)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_blediscoveryimplementationdelegate_stop_scanning` checksum `49638`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_blediscoveryimplementationdelegate_stop_scanning` checksum `49638`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_bleserverimplementationdelegate_start_server();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_bleserverimplementationdelegate_start_server();
             if (checksum != 14817)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_bleserverimplementationdelegate_start_server` checksum `14817`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_bleserverimplementationdelegate_start_server` checksum `14817`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_bleserverimplementationdelegate_stop_server();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_bleserverimplementationdelegate_stop_server();
             if (checksum != 32196)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_bleserverimplementationdelegate_stop_server` checksum `32196`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_bleserverimplementationdelegate_stop_server` checksum `32196`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_devicelistupdatedelegate_device_added();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_devicelistupdatedelegate_device_added();
             if (checksum != 27971)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_devicelistupdatedelegate_device_added` checksum `27971`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_devicelistupdatedelegate_device_added` checksum `27971`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_devicelistupdatedelegate_device_removed();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_devicelistupdatedelegate_device_removed();
             if (checksum != 65271)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_devicelistupdatedelegate_device_removed` checksum `65271`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_devicelistupdatedelegate_device_removed` checksum `65271`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_l2capdelegate_open_l2cap_connection();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_l2capdelegate_open_l2cap_connection();
             if (checksum != 32283)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_l2capdelegate_open_l2cap_connection` checksum `32283`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_l2capdelegate_open_l2cap_connection` checksum `32283`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_write();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_write();
             if (checksum != 8086)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_write` checksum `8086`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_write` checksum `8086`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_read();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_read();
             if (checksum != 26757)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_read` checksum `26757`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_read` checksum `26757`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_flush();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_flush();
             if (checksum != 9770)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_flush` checksum `9770`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_flush` checksum `9770`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_disconnect();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_disconnect();
             if (checksum != 28037)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_nativestreamdelegate_disconnect` checksum `28037`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_nativestreamdelegate_disconnect` checksum `28037`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_nearbyconnectiondelegate_received_connection_request();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_nearbyconnectiondelegate_received_connection_request();
             if (checksum != 34830)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_nearbyconnectiondelegate_received_connection_request` checksum `34830`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_nearbyconnectiondelegate_received_connection_request` checksum `34830`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_receiveprogressdelegate_progress_changed();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_receiveprogressdelegate_progress_changed();
             if (checksum != 521)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_receiveprogressdelegate_progress_changed` checksum `521`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_receiveprogressdelegate_progress_changed` checksum `521`, library returned `{checksum}`"
                 );
             }
         }
         {
             var checksum =
-                _UniFFILib.uniffi_data_rct_ffi_checksum_method_sendprogressdelegate_progress_changed();
+                _UniFFILib.uniffi_intershare_sdk_ffi_checksum_method_sendprogressdelegate_progress_changed();
             if (checksum != 50352)
             {
                 throw new UniffiContractChecksumException(
-                    $"DataRct: uniffi bindings expected function `uniffi_data_rct_ffi_checksum_method_sendprogressdelegate_progress_changed` checksum `50352`, library returned `{checksum}`"
+                    $"InterShareSDK: uniffi bindings expected function `uniffi_intershare_sdk_ffi_checksum_method_sendprogressdelegate_progress_changed` checksum `50352`, library returned `{checksum}`"
                 );
             }
         }
@@ -1963,7 +1963,7 @@ internal class ConnectionRequestSafeHandle : FFISafeHandle
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_free_connectionrequest(this.handle, ref status);
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_free_connectionrequest(this.handle, ref status);
             }
         );
         return true;
@@ -1979,7 +1979,7 @@ internal class ConnectionRequest : FFIObject<ConnectionRequestSafeHandle>, IConn
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_connectionrequest_accept(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_connectionrequest_accept(
                     this.GetHandle(),
                     ref _status
                 )
@@ -1990,7 +1990,7 @@ internal class ConnectionRequest : FFIObject<ConnectionRequestSafeHandle>, IConn
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_connectionrequest_decline(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_connectionrequest_decline(
                     this.GetHandle(),
                     ref _status
                 )
@@ -2002,7 +2002,7 @@ internal class ConnectionRequest : FFIObject<ConnectionRequestSafeHandle>, IConn
         return FfiConverterOptionalTypeClipboardTransferIntent.INSTANCE.Lift(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_method_connectionrequest_get_clipboard_intent(
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_clipboard_intent(
                         this.GetHandle(),
                         ref _status
                     )
@@ -2015,7 +2015,7 @@ internal class ConnectionRequest : FFIObject<ConnectionRequestSafeHandle>, IConn
         return FfiConverterOptionalTypeFileTransferIntent.INSTANCE.Lift(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_method_connectionrequest_get_file_transfer_intent(
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_file_transfer_intent(
                         this.GetHandle(),
                         ref _status
                     )
@@ -2028,7 +2028,7 @@ internal class ConnectionRequest : FFIObject<ConnectionRequestSafeHandle>, IConn
         return FfiConverterTypeConnectionIntentType.INSTANCE.Lift(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_method_connectionrequest_get_intent_type(
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_intent_type(
                         this.GetHandle(),
                         ref _status
                     )
@@ -2041,7 +2041,7 @@ internal class ConnectionRequest : FFIObject<ConnectionRequestSafeHandle>, IConn
         return FfiConverterTypeDevice.INSTANCE.Lift(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_method_connectionrequest_get_sender(
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_connectionrequest_get_sender(
                         this.GetHandle(),
                         ref _status
                     )
@@ -2053,7 +2053,7 @@ internal class ConnectionRequest : FFIObject<ConnectionRequestSafeHandle>, IConn
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_connectionrequest_set_progress_delegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_connectionrequest_set_progress_delegate(
                     this.GetHandle(),
                     FfiConverterTypeReceiveProgressDelegate.INSTANCE.Lower(@delegate),
                     ref _status
@@ -2118,7 +2118,7 @@ internal class InternalDiscoverySafeHandle : FFISafeHandle
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_free_internaldiscovery(this.handle, ref status);
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_free_internaldiscovery(this.handle, ref status);
             }
         );
         return true;
@@ -2135,7 +2135,7 @@ internal class InternalDiscovery : FFIObject<InternalDiscoverySafeHandle>, IInte
             _UniffiHelpers.RustCallWithError(
                 FfiConverterTypeDiscoverySetupException.INSTANCE,
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_constructor_internaldiscovery_new(
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_constructor_internaldiscovery_new(
                         FfiConverterOptionalTypeDeviceListUpdateDelegate.INSTANCE.Lower(@delegate),
                         ref _status
                     )
@@ -2146,7 +2146,7 @@ internal class InternalDiscovery : FFIObject<InternalDiscoverySafeHandle>, IInte
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internaldiscovery_add_ble_implementation(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_add_ble_implementation(
                     this.GetHandle(),
                     FfiConverterTypeBleDiscoveryImplementationDelegate.INSTANCE.Lower(
                         @implementation
@@ -2160,7 +2160,7 @@ internal class InternalDiscovery : FFIObject<InternalDiscoverySafeHandle>, IInte
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internaldiscovery_parse_discovery_message(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_parse_discovery_message(
                     this.GetHandle(),
                     FfiConverterByteArray.INSTANCE.Lower(@data),
                     FfiConverterOptionalString.INSTANCE.Lower(@bleUuid),
@@ -2173,7 +2173,7 @@ internal class InternalDiscovery : FFIObject<InternalDiscoverySafeHandle>, IInte
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internaldiscovery_start(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_start(
                     this.GetHandle(),
                     ref _status
                 )
@@ -2184,7 +2184,7 @@ internal class InternalDiscovery : FFIObject<InternalDiscoverySafeHandle>, IInte
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internaldiscovery_stop(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internaldiscovery_stop(
                     this.GetHandle(),
                     ref _status
                 )
@@ -2263,7 +2263,7 @@ internal class InternalNearbyServerSafeHandle : FFISafeHandle
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_free_internalnearbyserver(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_free_internalnearbyserver(
                     this.handle,
                     ref status
                 );
@@ -2288,7 +2288,7 @@ internal class InternalNearbyServer
         : this(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_constructor_internalnearbyserver_new(
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_constructor_internalnearbyserver_new(
                         FfiConverterTypeDevice.INSTANCE.Lower(@myDevice),
                         FfiConverterString.INSTANCE.Lower(@fileStorage),
                         FfiConverterTypeNearbyConnectionDelegate.INSTANCE.Lower(@delegate),
@@ -2301,7 +2301,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_add_ble_implementation(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_add_ble_implementation(
                     this.GetHandle(),
                     FfiConverterTypeBleServerImplementationDelegate.INSTANCE.Lower(
                         @bleImplementation
@@ -2315,7 +2315,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_add_l2_cap_client(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_add_l2_cap_client(
                     this.GetHandle(),
                     FfiConverterTypeL2CapDelegate.INSTANCE.Lower(@delegate),
                     ref _status
@@ -2327,7 +2327,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_change_device(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_change_device(
                     this.GetHandle(),
                     FfiConverterTypeDevice.INSTANCE.Lower(@newDevice),
                     ref _status
@@ -2340,7 +2340,7 @@ internal class InternalNearbyServer
         return FfiConverterByteArray.INSTANCE.Lift(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_get_advertisement_data(
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_get_advertisement_data(
                         this.GetHandle(),
                         ref _status
                     )
@@ -2355,7 +2355,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_handle_incoming_ble_connection(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_handle_incoming_ble_connection(
                     this.GetHandle(),
                     FfiConverterString.INSTANCE.Lower(@connectionId),
                     FfiConverterTypeNativeStreamDelegate.INSTANCE.Lower(@nativeStream),
@@ -2368,7 +2368,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_handle_incoming_connection(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_handle_incoming_connection(
                     this.GetHandle(),
                     FfiConverterTypeNativeStreamDelegate.INSTANCE.Lower(@nativeStreamHandle),
                     ref _status
@@ -2382,7 +2382,7 @@ internal class InternalNearbyServer
         _UniffiHelpers.RustCallWithError(
             FfiConverterTypeConnectErrors.INSTANCE,
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_send_file(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_send_file(
                     this.GetHandle(),
                     FfiConverterTypeDevice.INSTANCE.Lower(@receiver),
                     FfiConverterString.INSTANCE.Lower(@filePath),
@@ -2396,7 +2396,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_set_ble_connection_details(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_set_ble_connection_details(
                     this.GetHandle(),
                     FfiConverterTypeBluetoothLeConnectionInfo.INSTANCE.Lower(@bleDetails),
                     ref _status
@@ -2408,7 +2408,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_set_tcp_details(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_set_tcp_details(
                     this.GetHandle(),
                     FfiConverterTypeTcpConnectionInfo.INSTANCE.Lower(@tcpDetails),
                     ref _status
@@ -2420,7 +2420,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_start(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_start(
                     this.GetHandle(),
                     ref _status
                 )
@@ -2431,7 +2431,7 @@ internal class InternalNearbyServer
     {
         _UniffiHelpers.RustCall(
             (ref RustCallStatus _status) =>
-                _UniFFILib.uniffi_data_rct_ffi_fn_method_internalnearbyserver_stop(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_stop(
                     this.GetHandle(),
                     ref _status
                 )
@@ -3468,7 +3468,7 @@ class FfiConverterTypeBleDiscoveryImplementationDelegate
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_blediscoveryimplementationdelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_blediscoveryimplementationdelegate(
                     ForeignCallbackTypeBleDiscoveryImplementationDelegate.INSTANCE,
                     ref status
                 );
@@ -3599,7 +3599,7 @@ class FfiConverterTypeBleServerImplementationDelegate
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_bleserverimplementationdelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_bleserverimplementationdelegate(
                     ForeignCallbackTypeBleServerImplementationDelegate.INSTANCE,
                     ref status
                 );
@@ -3724,7 +3724,7 @@ class FfiConverterTypeDeviceListUpdateDelegate
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_devicelistupdatedelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_devicelistupdatedelegate(
                     ForeignCallbackTypeDeviceListUpdateDelegate.INSTANCE,
                     ref status
                 );
@@ -3824,7 +3824,7 @@ class FfiConverterTypeL2CapDelegate : FfiConverterCallbackInterface<L2CapDelegat
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_l2capdelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_l2capdelegate(
                     ForeignCallbackTypeL2CapDelegate.INSTANCE,
                     ref status
                 );
@@ -4008,7 +4008,7 @@ class FfiConverterTypeNativeStreamDelegate : FfiConverterCallbackInterface<Nativ
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_nativestreamdelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_nativestreamdelegate(
                     ForeignCallbackTypeNativeStreamDelegate.INSTANCE,
                     ref status
                 );
@@ -4109,7 +4109,7 @@ class FfiConverterTypeNearbyConnectionDelegate
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_nearbyconnectiondelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_nearbyconnectiondelegate(
                     ForeignCallbackTypeNearbyConnectionDelegate.INSTANCE,
                     ref status
                 );
@@ -4210,7 +4210,7 @@ class FfiConverterTypeReceiveProgressDelegate
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_receiveprogressdelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_receiveprogressdelegate(
                     ForeignCallbackTypeReceiveProgressDelegate.INSTANCE,
                     ref status
                 );
@@ -4307,7 +4307,7 @@ class FfiConverterTypeSendProgressDelegate : FfiConverterCallbackInterface<SendP
         _UniffiHelpers.RustCall(
             (ref RustCallStatus status) =>
             {
-                _UniFFILib.uniffi_data_rct_ffi_fn_init_callback_sendprogressdelegate(
+                _UniFFILib.uniffi_intershare_sdk_ffi_fn_init_callback_sendprogressdelegate(
                     ForeignCallbackTypeSendProgressDelegate.INSTANCE,
                     ref status
                 );
@@ -4492,14 +4492,14 @@ class FfiConverterOptionalTypeDeviceListUpdateDelegate
     }
 }
 #pragma warning restore 8625
-internal static class DataRctMethods
+internal static class InterShareSDKMethods
 {
     public static String GetBleCharacteristicUuid()
     {
         return FfiConverterString.INSTANCE.Lift(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_func_get_ble_characteristic_uuid(ref _status)
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_func_get_ble_characteristic_uuid(ref _status)
             )
         );
     }
@@ -4509,7 +4509,7 @@ internal static class DataRctMethods
         return FfiConverterString.INSTANCE.Lift(
             _UniffiHelpers.RustCall(
                 (ref RustCallStatus _status) =>
-                    _UniFFILib.uniffi_data_rct_ffi_fn_func_get_ble_service_uuid(ref _status)
+                    _UniFFILib.uniffi_intershare_sdk_ffi_fn_func_get_ble_service_uuid(ref _status)
             )
         );
     }
