@@ -30,7 +30,7 @@ class BluetoothGattCallbackImplementation(
             gatt.close()
             currentlyConnectedDevices.remove(gatt.device)
         } else {
-            Log.d("BLE", "newState: $newState")
+            Log.d("InterShareSDK [BLE Central]", "newState: $newState")
             currentlyConnectedDevices.remove(gatt.device)
         }
     }
@@ -92,7 +92,7 @@ class BluetoothGattCallbackImplementation(
 
     private fun handleCharacteristicData(data: ByteArray, status: Int, gatt: BluetoothGatt) {
         if (status == BluetoothGatt.GATT_SUCCESS) {
-            Log.d("InterShare SDK", "GATT READ was a Success")
+            Log.d("InterShareSDK [BLE Central]", "GATT READ was a Success")
 
             internal.parseDiscoveryMessage(data, gatt.device.address)
 
@@ -187,7 +187,7 @@ class BLECentralManager(private val context: Context, private val internal: Inte
         fun addDevice(device: BluetoothDevice) {
             if (!currentlyConnectedDevices.contains(device)) {
                 currentlyConnectedDevices.add(device)
-                Log.d("InterShare SDK", "Found device: ${device.name} (${device.address}): ${device.uuids}")
+                Log.d("InterShareSDK [BLE Central]", "Found device: ${device.name} (${device.address}): ${device.uuids}")
 
                 device.connectGatt(
                     context,

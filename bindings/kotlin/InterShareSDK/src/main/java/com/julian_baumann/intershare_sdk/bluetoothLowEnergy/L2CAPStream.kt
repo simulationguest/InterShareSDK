@@ -11,7 +11,7 @@ class L2CAPStream(private val socket: BluetoothSocket): NativeStreamDelegate {
 
             return data.size.toULong()
         } catch (exception: Exception) {
-            Log.w("L2CAPStream write exception:", exception)
+            Log.w("InterShareSDK [L2CapStream]", "L2CAPStream write exception: $exception")
 
             return 0.toULong()
         }

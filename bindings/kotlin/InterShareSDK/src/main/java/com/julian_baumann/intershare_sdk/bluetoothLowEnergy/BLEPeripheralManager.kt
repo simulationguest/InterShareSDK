@@ -63,11 +63,11 @@ internal class BLEPeripheralManager(private val context: Context, private val in
 
     private val advertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
-            Log.i("BLE", "LE Advertise Started.")
+            Log.i("InterShareSDK [BLE Manager]", "LE Advertise Started.")
         }
 
         override fun onStartFailure(errorCode: Int) {
-            Log.w("BLE", "LE Advertise Failed: $errorCode")
+            Log.w("InterShareSDK [BLE Manager]", "LE Advertise Failed: $errorCode")
         }
     }
 
@@ -79,16 +79,21 @@ internal class BLEPeripheralManager(private val context: Context, private val in
         bluetoothL2CAPServer = bluetoothManager.adapter.listenUsingInsecureL2capChannel()
 
         l2CAPThread = Thread {
-            val psm = bluetoothL2CAPServer!!.psm.toUInt()
-            internalNearbyServer.setBleConnectionDetails(BluetoothLeConnectionInfo("", psm))
+            try {
+                val psm = bluetoothL2CAPServer!!.psm.toUInt()
+                internalNearbyServer.setBleConnectionDetails(BluetoothLeConnectionInfo("", psm))
 
-            while (true) {
-                val connection = bluetoothL2CAPServer!!.accept()
-                val stream = L2CAPStream(connection)
+                while (true) {
+                    val connection = bluetoothL2CAPServer!!.accept()
+                    val stream = L2CAPStream(connection)
 
-                CoroutineScope(Dispatchers.Main).launch {
-                    internalNearbyServer.handleIncomingConnection(stream)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        internalNearbyServer.handleIncomingConnection(stream)
+                    }
                 }
+            }
+            catch (e: Exception) {
+                Log.e("InterShareSDK [BLE Manager]", e.toString())
             }
         }
 
@@ -96,7 +101,7 @@ internal class BLEPeripheralManager(private val context: Context, private val in
 
         bluetoothGattServer = bluetoothManager.openGattServer(context, gattServerCallback)
         bluetoothGattServer?.addService(createService())
-            ?: Log.w("BLE", "Unable to create GATT server")
+            ?: Log.w("InterShareSDK [BLE Manager]", "Unable to create GATT server")
     }
 
     private fun stopGattServer() {
@@ -129,7 +134,7 @@ internal class BLEPeripheralManager(private val context: Context, private val in
             }
 
             it.startAdvertising(settings, data, advertiseCallback)
-        } ?: Log.w("BLE", "Failed to create advertiser")
+        } ?: Log.w("InterShareSDK [BLE Manager]", "Failed to create advertiser")
     }
 
     private fun stopAdvertising() {
@@ -138,14 +143,14 @@ internal class BLEPeripheralManager(private val context: Context, private val in
         }
 
         val bluetoothLeAdvertiser: BluetoothLeAdvertiser? = bluetoothManager.adapter.bluetoothLeAdvertiser
-        bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback) ?: Log.w("BLE", "Failed to create advertiser")
+        bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback) ?: Log.w("InterShareSDK [BLE Manager]", "Failed to create advertiser")
     }
 
     override fun startServer() {
         if (!bluetoothManager.adapter.isEnabled) {
-            Log.d("BLE", "Bluetooth is currently disabled...enabling")
+            Log.d("InterShareSDK [BLE Manager]", "Bluetooth is currently disabled...enabling")
         } else {
-            Log.d("BLE", "Bluetooth enabled...starting services")
+            Log.d("InterShareSDK [BLE Manager]", "Bluetooth enabled...starting services")
             startGattServer()
             startAdvertising()
         }

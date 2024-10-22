@@ -29,7 +29,7 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            Log.d("NetworkMonitor", "No network connection")
+            Log.d("InterShareSDK [NetworkMonitor]", "No network connection")
             currentIPAddress = null
         }
     }
@@ -43,10 +43,10 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
 
             when {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
-                    Log.d("NetworkMonitor", "Connected via Wi-Fi")
+                    Log.d("InterShareSDK [NetworkMonitor]", "Connected via Wi-Fi")
                     if (ip != currentIPAddress) {
                         currentIPAddress = ip
-                        Log.d("NetworkMonitor", "Wi-Fi IP Address: $ip")
+                        Log.d("InterShareSDK [NetworkMonitor]", "Wi-Fi IP Address: $ip")
 
                         if (started) {
                             CoroutineScope(Dispatchers.Default).launch {
@@ -56,10 +56,10 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
                     }
                 }
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
-                    Log.d("NetworkMonitor", "Connected via Cellular Data")
+                    Log.d("InterShareSDK [NetworkMonitor]", "Connected via Cellular Data")
                     if (ip != currentIPAddress) {
                         currentIPAddress = ip
-                        Log.d("NetworkMonitor", "Cellular IP Address: $ip")
+                        Log.d("InterShareSDK [NetworkMonitor]", "Cellular IP Address: $ip")
 
                         if (started) {
                             CoroutineScope(Dispatchers.Default).launch {
@@ -69,7 +69,7 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
                     }
                 }
                 else -> {
-                    Log.d("NetworkMonitor", "Unknown network type")
+                    Log.d("InterShareSDK [NetworkMonitor]", "Unknown network type")
                     currentIPAddress = null
                 }
             }
