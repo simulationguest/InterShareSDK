@@ -19,6 +19,7 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
     private val internalL2CapClient = L2CAPClientManager(internal)
     private var currentIPAddress: String? = null
     private var connectivityManager: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private var started = false
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
@@ -47,8 +48,10 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
                         currentIPAddress = ip
                         Log.d("NetworkMonitor", "Wi-Fi IP Address: $ip")
 
-                        CoroutineScope(Dispatchers.Default).launch {
-                            internal.restartServer()
+                        if (started) {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                internal.restartServer()
+                            }
                         }
                     }
                 }
@@ -58,8 +61,10 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
                         currentIPAddress = ip
                         Log.d("NetworkMonitor", "Cellular IP Address: $ip")
 
-                        CoroutineScope(Dispatchers.Default).launch {
-                            internal.restartServer()
+                        if (started) {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                internal.restartServer()
+                            }
                         }
                     }
                 }
@@ -81,6 +86,7 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
 
     suspend fun start() {
         internal.start()
+        started = true
     }
 
     fun changeDevice(newDevice: Device) {
@@ -93,5 +99,6 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
 
     suspend fun stop() {
         internal.stop()
+        started = false
     }
 }
