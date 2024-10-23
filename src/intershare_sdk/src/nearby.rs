@@ -363,10 +363,19 @@ impl NearbyServer {
 
         NearbyServer::update_progress(&progress_delegate, SendProgressState::Requesting);
 
+        let file_name = {
+            if file_paths.len() == 1 {
+                let path = Path::new(file_paths.first().unwrap());
+                Some(convert_os_str(path.file_name().expect("Failed to get file name")).expect("Failed to parse OS String"))
+            } else {
+                None
+            }
+        };
+
         let transfer_request = TransferRequest {
             device: self.variables.read().await.device_connection_info.device.clone(),
             intent: Some(Intent::FileTransfer(FileTransferIntent {
-                file_name: None,
+                file_name,
                 file_size,
                 file_count: file_paths.len() as u64
             }))
