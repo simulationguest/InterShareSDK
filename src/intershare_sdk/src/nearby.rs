@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::{fs, thread};
-use std::fs::{File, OpenOptions};
+use std::fs::{File};
 use std::io::{Read, Write};
 use std::net::ToSocketAddrs;
 use std::path::{Path, PathBuf};
@@ -281,76 +281,6 @@ impl NearbyServer {
         }
     }
 
-    async fn send_single_file(&self, mut encrypted_stream: Box<dyn EncryptedReadWrite>, file_path: &String, progress_delegate: &Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
-        let mut proto_stream = Stream::new(&mut encrypted_stream);
-
-        let path = Path::new(file_path);
-        let filename = path.file_name().expect("Failed to get file name");
-        let metadata = fs::metadata(file_path).expect("Failed to get metadata for file");
-        let file_size = metadata.len();
-
-        NearbyServer::update_progress(&progress_delegate, SendProgressState::Requesting);
-
-        let transfer_request = TransferRequest {
-            device: self.variables.read().await.device_connection_info.device.clone(),
-            intent: Some(Intent::FileTransfer(FileTransferIntent {
-                file_name: convert_os_str(filename),
-                file_size,
-                file_count: 1
-            }))
-        };
-
-        let _ = proto_stream.send(&transfer_request);
-
-        let response = match proto_stream.recv::<TransferRequestResponse>() {
-            Ok(message) => message,
-            Err(error) => return Err(ConnectErrors::FailedToGetTransferRequestResponse { error: error.to_string() })
-        };
-
-        if !response.accepted {
-            NearbyServer::update_progress(&progress_delegate, SendProgressState::Declined);
-            return Err(ConnectErrors::Declined);
-        }
-
-        let mut file = OpenOptions::new()
-            .write(false)
-            .create(false)
-            .read(true)
-            .open(file_path.clone())
-            .expect("Failed to open file");
-
-        let mut buffer = [0; 1024];
-
-        NearbyServer::update_progress(&progress_delegate, SendProgressState::Transferring { progress: 0.0 });
-
-        let mut all_written: usize = 0;
-
-        while let Ok(read_size) = file.read(&mut buffer) {
-            if read_size == 0 {
-                break;
-            }
-
-            let written_bytes = encrypted_stream.write(&buffer[..read_size])
-                .expect("Failed to write file buffer");
-
-            if written_bytes <= 0 {
-                break;
-            }
-
-            all_written += written_bytes;
-
-            NearbyServer::update_progress(&progress_delegate, SendProgressState::Transferring { progress: (all_written as f64 / file_size as f64) });
-        }
-
-        if (all_written as f64) < (file_size as f64) {
-            NearbyServer::update_progress(&progress_delegate, SendProgressState::Cancelled);
-        } else {
-            NearbyServer::update_progress(&progress_delegate, SendProgressState::Finished);
-        }
-
-        return Ok(());
-    }
-
     fn zip_directory(&self, zip: &mut ZipWriter<File>, prefix: String, dir_path: &str) {
         let path = Path::new(&dir_path);
 
@@ -392,7 +322,14 @@ impl NearbyServer {
         }
     }
 
-    async fn send_multiple_files(&self, mut encrypted_stream: Box<dyn EncryptedReadWrite>, file_paths: Vec<String>, progress_delegate: &Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
+    pub async fn send_files(&self, receiver: Device, file_paths: Vec<String>, progress_delegate: Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
+        NearbyServer::update_progress(&progress_delegate, SendProgressState::Connecting);
+
+        let mut encrypted_stream = match self.connect(receiver, &progress_delegate).await {
+            Ok(connection) => connection,
+            Err(error) => return Err(error)
+        };
+
         let mut proto_stream = Stream::new(&mut encrypted_stream);
 
         NearbyServer::update_progress(&progress_delegate, SendProgressState::Compressing);
@@ -481,27 +418,6 @@ impl NearbyServer {
         }
 
         return Ok(());
-    }
-
-    pub async fn send_files(&self, receiver: Device, file_paths: Vec<String>, progress_delegate: Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
-        NearbyServer::update_progress(&progress_delegate, SendProgressState::Connecting);
-
-        let encrypted_stream = match self.connect(receiver, &progress_delegate).await {
-            Ok(connection) => connection,
-            Err(error) => return Err(error)
-        };
-
-        if file_paths.len() == 1 {
-            let file_path = file_paths.first().unwrap();
-
-            if Path::new(&file_path).is_dir() {
-                return self.send_multiple_files(encrypted_stream, vec![file_path.clone()], &progress_delegate).await;
-            }
-
-            return self.send_single_file(encrypted_stream, file_path, &progress_delegate).await;
-        } else {
-            return self.send_multiple_files(encrypted_stream, file_paths, &progress_delegate).await;
-        }
     }
 
     pub fn handle_incoming_connection(&self, native_stream_handle: Box<dyn NativeStreamDelegate>) {

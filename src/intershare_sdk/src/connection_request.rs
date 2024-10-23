@@ -1,7 +1,5 @@
-use std::fs::{self, File};
 use std::fmt::Debug;
 use std::io::{Read, Write};
-use std::path::Path;
 use std::sync::{Arc, Mutex, MutexGuard};
 use prost_stream::Stream;
 use protocol::communication::transfer_request::Intent;
@@ -11,7 +9,7 @@ use tempfile::NamedTempFile;
 use tokio::sync::RwLock;
 use crate::{encryption::EncryptedReadWrite, nearby::ConnectionIntentType};
 use crate::zip::unzip_file;
-use crate::{convert_os_str, BLE_BUFFER_SIZE};
+use crate::{BLE_BUFFER_SIZE};
 
 pub enum ReceiveProgressState {
     Unknown,
@@ -125,19 +123,8 @@ impl ConnectionRequest {
     }
 
     fn handle_file(&self, mut stream: MutexGuard<Box<dyn EncryptedReadWrite>>, file_transfer: FileTransferIntent) -> Option<Vec<String>> {
-        let mut named_temp_file: Option<File> = None;
-        let mut file_path: Option<String> = None;
-
-        let mut file = if file_transfer.file_count == 1 {
-            let path = Path::new(&self.file_storage);
-            let path = path.join(&file_transfer.file_name.expect("No name provided"));
-            file_path = convert_os_str(&path.into_os_string());
-            File::create(file_path.clone().unwrap().clone()).expect("Failed to create file")
-        } else {
-            let named_file = NamedTempFile::new().expect("Failed to create temporary ZIP file.");
-            named_temp_file = Some(named_file.reopen().unwrap());
-            named_file.into_file()
-        };
+        let named_file = NamedTempFile::new().expect("Failed to create temporary ZIP file.");
+        let mut zip_file = named_file.reopen().expect("Failed to reopen temporary ZIP file");
 
         let mut buffer = [0; BLE_BUFFER_SIZE];
         let mut all_read = 0.0;
@@ -153,7 +140,7 @@ impl ConnectionRequest {
 
             all_read += read_size as f64;
 
-            file.write_all(&buffer[..read_size])
+            zip_file.write_all(&buffer[..read_size])
                 .expect("Failed to write file to disk");
 
             let progress = all_read / file_transfer.file_size as f64;
@@ -167,26 +154,20 @@ impl ConnectionRequest {
         stream.close();
 
         if all_read < file_transfer.file_size as f64 {
-            let _ = fs::remove_file(file_path.unwrap());
+            let _ = named_file.close();
             self.update_progress(ReceiveProgressState::Cancelled);
         } else {
-            if file_transfer.file_count == 1 {
+            self.update_progress(ReceiveProgressState::Extracting);
+
+            let zip_result = unzip_file(zip_file, &self.file_storage);
+
+            if let Ok(files) = zip_result {
                 self.update_progress(ReceiveProgressState::Finished);
 
-                return Some(vec![file_path.unwrap()])
-            } else {
-                self.update_progress(ReceiveProgressState::Extracting);
-
-                let zip_result = unzip_file(named_temp_file.unwrap(), &self.file_storage);
-
-                if let Ok(files) = zip_result {
-                    self.update_progress(ReceiveProgressState::Finished);
-
-                    return Some(files);
-                } else if let Err(error) = zip_result {
-                    println!("Error {:?}", error);
-                    self.update_progress(ReceiveProgressState::Cancelled);
-                }
+                return Some(files);
+            } else if let Err(error) = zip_result {
+                println!("Error {:?}", error);
+                self.update_progress(ReceiveProgressState::Cancelled);
             }
         };
 
