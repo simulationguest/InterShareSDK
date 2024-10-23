@@ -1,14 +1,9 @@
 use std::io::{Cursor, Read, Write};
-use intershare_sdk::stream::{Stream, StreamRead, StreamWrite};
 
 pub struct MemoryStream {
     last_written_byte_length: usize,
     cursor: Cursor<Vec<u8>>
 }
-
-impl StreamRead for MemoryStream {}
-impl StreamWrite for MemoryStream {}
-impl Stream for MemoryStream {}
 
 impl MemoryStream {
     pub fn new() -> Self {

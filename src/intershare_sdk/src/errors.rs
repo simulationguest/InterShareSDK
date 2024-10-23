@@ -7,6 +7,9 @@ pub enum ConnectErrors {
     #[error("Peripheral is unreachable")]
     Unreachable,
 
+    #[error("No files to send")]
+    NoFilesProvided,
+
     #[error("Failed to get connection details")]
     FailedToGetConnectionDetails,
 

@@ -17,6 +17,7 @@ interface TransmissionSetupError {
 [Error]
 interface ConnectErrors {
     Unreachable();
+    NoFilesProvided();
     FailedToGetConnectionDetails();
     Declined();
     FailedToGetTcpDetails();
@@ -59,7 +60,7 @@ dictionary TcpConnectionInfo {
 dictionary FileTransferIntent {
     string? file_name;
     u64 file_size;
-    boolean multiple;
+    u64 file_count;
 };
 
 dictionary ClipboardTransferIntent {
@@ -76,6 +77,7 @@ interface ReceiveProgressState {
     Unknown();
     Handshake();
     Receiving(double progress);
+    Extracting();
     Cancelled();
     Finished();
 };
@@ -138,6 +140,7 @@ interface SendProgressState {
     Connecting();
     Requesting();
     ConnectionMediumUpdate(ConnectionMedium medium);
+    Compressing();
     Transferring(double progress);
     Cancelled();
     Finished();

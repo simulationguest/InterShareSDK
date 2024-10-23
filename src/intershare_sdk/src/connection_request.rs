@@ -7,15 +7,17 @@ use prost_stream::Stream;
 use protocol::communication::transfer_request::Intent;
 use protocol::communication::{ClipboardTransferIntent, FileTransferIntent, TransferRequest, TransferRequestResponse};
 use protocol::discovery::Device;
+use tempfile::NamedTempFile;
 use tokio::sync::RwLock;
-use crate::encryption::EncryptedReadWrite;
-use crate::nearby::ConnectionIntentType;
-use crate::BLE_BUFFER_SIZE;
+use crate::{encryption::EncryptedReadWrite, nearby::ConnectionIntentType};
+use crate::zip::unzip_file;
+use crate::{convert_os_str, BLE_BUFFER_SIZE};
 
 pub enum ReceiveProgressState {
     Unknown,
     Handshake,
     Receiving { progress: f64 },
+    Extracting,
     Cancelled,
     Finished
 }
@@ -123,11 +125,19 @@ impl ConnectionRequest {
     }
 
     fn handle_file(&self, mut stream: MutexGuard<Box<dyn EncryptedReadWrite>>, file_transfer: FileTransferIntent) {
-        let path = Path::new(&self.file_storage);
-        let path = path.join(&file_transfer.file_name.unwrap_or_else(|| "temp.zip".to_string()));
-        let path = path.into_os_string();
+        let mut named_temp_file: Option<File> = None;
+        let mut file_path: Option<String> = None;
 
-        let mut file = File::create(path.clone()).expect("Failed to create file");
+        let mut file = if file_transfer.file_count == 1 {
+            let path = Path::new(&self.file_storage);
+            let path = path.join(&file_transfer.file_name.expect("No name provided"));
+            file_path = convert_os_str(&path.into_os_string());
+            File::create(file_path.clone().unwrap().clone()).expect("Failed to create file")
+        } else {
+            let named_file = NamedTempFile::new().expect("Failed to create temporary ZIP file.");
+            named_temp_file = Some(named_file.reopen().unwrap());
+            named_file.into_file()
+        };
 
         let mut buffer = [0; BLE_BUFFER_SIZE];
         let mut all_read = 0.0;
@@ -157,10 +167,19 @@ impl ConnectionRequest {
         stream.close();
 
         if all_read < file_transfer.file_size as f64 {
-            let _ = fs::remove_file(path);
+            let _ = fs::remove_file(file_path.unwrap());
             self.update_progress(ReceiveProgressState::Cancelled);
         } else {
-            self.update_progress(ReceiveProgressState::Finished);
+            if file_transfer.file_count == 1 {
+                self.update_progress(ReceiveProgressState::Finished);
+            } else {
+                self.update_progress(ReceiveProgressState::Extracting);
+                if let Err(error) = unzip_file(named_temp_file.unwrap(), &self.file_storage) {
+                    println!("Error {:?}", error);
+                }
+
+                self.update_progress(ReceiveProgressState::Finished);
+            }
         }
     }
 }

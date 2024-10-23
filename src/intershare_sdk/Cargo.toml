@@ -23,3 +23,5 @@ local-ip-address = { git = "https://github.com/julian-baumann/local-ip-address.g
 prost-stream = "0.1.2"
 android_logger = "0.13.3"
 log = "0.4.20"
+tempfile = "3"
+zip = "2.2.0"

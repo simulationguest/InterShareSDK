@@ -95,8 +95,8 @@ impl InternalNearbyServer {
         return self.handler.handle_incoming_ble_connection(connection_id, native_stream);
     }
 
-    pub fn send_file(&self, receiver: Device, file_path: String, progress_delegate: Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
-        return self.async_runtime.block_on(self.handler.send_file(receiver, file_path, progress_delegate));
+    pub fn send_files(&self, receiver: Device, file_paths: Vec<String>, progress_delegate: Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
+        return self.async_runtime.block_on(self.handler.send_files(receiver, file_paths, progress_delegate));
     }
 
     pub fn stop(&self) {

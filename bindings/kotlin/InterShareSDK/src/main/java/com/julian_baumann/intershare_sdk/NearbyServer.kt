@@ -1,5 +1,6 @@
 package com.julian_baumann.intershare_sdk
 
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -14,8 +15,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectionDelegate) {
+    private val bluetoothManager: BluetoothManager by lazy {
+        context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    }
+
     private val internal: InternalNearbyServer = InternalNearbyServer(myDevice, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath, delegate)
-    private val internalBleImplementation = BLEPeripheralManager(context, internal)
+    private val internalBleImplementation = BLEPeripheralManager(context, internal, bluetoothManager)
     private val internalL2CapClient = L2CAPClientManager(internal)
     private var currentIPAddress: String? = null
     private var connectivityManager: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -74,6 +79,10 @@ class NearbyServer(context: Context, myDevice: Device, delegate: NearbyConnectio
                 }
             }
         }
+    }
+
+    val bluetoothEnabled: Boolean get() {
+        return bluetoothManager.adapter.isEnabled
     }
 
     init {

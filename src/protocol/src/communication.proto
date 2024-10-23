@@ -39,7 +39,7 @@ message TransferRequest {
 message FileTransferIntent {
     optional string file_name = 1;
     uint64 file_size = 2;
-    bool multiple = 3;
+    uint64 file_count = 4;
 }
 
 message ClipboardTransferIntent {

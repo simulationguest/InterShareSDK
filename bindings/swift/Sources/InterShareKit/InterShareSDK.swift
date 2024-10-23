@@ -422,27 +422,6 @@ private struct FfiConverterDouble: FfiConverterPrimitive {
     }
 }
 
-private struct FfiConverterBool: FfiConverter {
-    typealias FfiType = Int8
-    typealias SwiftType = Bool
-
-    public static func lift(_ value: Int8) throws -> Bool {
-        return value != 0
-    }
-
-    public static func lower(_ value: Bool) -> Int8 {
-        return value ? 1 : 0
-    }
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> Bool {
-        return try lift(readInt(&buf))
-    }
-
-    public static func write(_ value: Bool, into buf: inout [UInt8]) {
-        writeInt(&buf, lower(value))
-    }
-}
-
 private struct FfiConverterString: FfiConverter {
     typealias SwiftType = String
     typealias FfiType = RustBuffer
@@ -810,7 +789,7 @@ public protocol InternalNearbyServerProtocol: AnyObject {
 
     func restartServer() async
 
-    func sendFile(receiver: Device, filePath: String, progressDelegate: SendProgressDelegate?) async throws
+    func sendFiles(receiver: Device, filePaths: [String], progressDelegate: SendProgressDelegate?) async throws
 
     func setBleConnectionDetails(bleDetails: BluetoothLeConnectionInfo)
 
@@ -945,13 +924,13 @@ open class InternalNearbyServer:
         )
     }
 
-    open func sendFile(receiver: Device, filePath: String, progressDelegate: SendProgressDelegate?) async throws {
+    open func sendFiles(receiver: Device, filePaths: [String], progressDelegate: SendProgressDelegate?) async throws {
         return try await uniffiRustCallAsync(
             rustFutureFunc: {
-                uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_send_file(
+                uniffi_intershare_sdk_ffi_fn_method_internalnearbyserver_send_files(
                     self.uniffiClonePointer(),
                     FfiConverterTypeDevice.lower(receiver),
-                    FfiConverterString.lower(filePath),
+                    FfiConverterSequenceString.lower(filePaths),
                     FfiConverterOptionCallbackInterfaceSendProgressDelegate.lower(progressDelegate)
                 )
             },
@@ -1208,18 +1187,18 @@ public func FfiConverterTypeDevice_lower(_ value: Device) -> RustBuffer {
 public struct FileTransferIntent {
     public var fileName: String?
     public var fileSize: UInt64
-    public var multiple: Bool
+    public var fileCount: UInt64
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
     public init(
         fileName: String?,
         fileSize: UInt64,
-        multiple: Bool
+        fileCount: UInt64
     ) {
         self.fileName = fileName
         self.fileSize = fileSize
-        self.multiple = multiple
+        self.fileCount = fileCount
     }
 }
 
@@ -1231,7 +1210,7 @@ extension FileTransferIntent: Equatable, Hashable {
         if lhs.fileSize != rhs.fileSize {
             return false
         }
-        if lhs.multiple != rhs.multiple {
+        if lhs.fileCount != rhs.fileCount {
             return false
         }
         return true
@@ -1240,7 +1219,7 @@ extension FileTransferIntent: Equatable, Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(fileName)
         hasher.combine(fileSize)
-        hasher.combine(multiple)
+        hasher.combine(fileCount)
     }
 }
 
@@ -1250,14 +1229,14 @@ public struct FfiConverterTypeFileTransferIntent: FfiConverterRustBuffer {
             try FileTransferIntent(
                 fileName: FfiConverterOptionString.read(from: &buf),
                 fileSize: FfiConverterUInt64.read(from: &buf),
-                multiple: FfiConverterBool.read(from: &buf)
+                fileCount: FfiConverterUInt64.read(from: &buf)
             )
     }
 
     public static func write(_ value: FileTransferIntent, into buf: inout [UInt8]) {
         FfiConverterOptionString.write(value.fileName, into: &buf)
         FfiConverterUInt64.write(value.fileSize, into: &buf)
-        FfiConverterBool.write(value.multiple, into: &buf)
+        FfiConverterUInt64.write(value.fileCount, into: &buf)
     }
 }
 
@@ -1326,6 +1305,7 @@ public func FfiConverterTypeTcpConnectionInfo_lower(_ value: TcpConnectionInfo) 
 
 public enum ConnectErrors {
     case Unreachable
+    case NoFilesProvided
     case FailedToGetConnectionDetails
     case Declined
     case FailedToGetTcpDetails
@@ -1356,23 +1336,24 @@ public struct FfiConverterTypeConnectErrors: FfiConverterRustBuffer {
         let variant: Int32 = try readInt(&buf)
         switch variant {
         case 1: return .Unreachable
-        case 2: return .FailedToGetConnectionDetails
-        case 3: return .Declined
-        case 4: return .FailedToGetTcpDetails
-        case 5: return .FailedToGetSocketAddress
-        case 6: return .FailedToOpenTcpStream
-        case 7: return try .FailedToEncryptStream(
+        case 2: return .NoFilesProvided
+        case 3: return .FailedToGetConnectionDetails
+        case 4: return .Declined
+        case 5: return .FailedToGetTcpDetails
+        case 6: return .FailedToGetSocketAddress
+        case 7: return .FailedToOpenTcpStream
+        case 8: return try .FailedToEncryptStream(
                 error: FfiConverterString.read(from: &buf)
             )
-        case 8: return try .FailedToDetermineFileSize(
+        case 9: return try .FailedToDetermineFileSize(
                 error: FfiConverterString.read(from: &buf)
             )
-        case 9: return try .FailedToGetTransferRequestResponse(
+        case 10: return try .FailedToGetTransferRequestResponse(
                 error: FfiConverterString.read(from: &buf)
             )
-        case 10: return .FailedToGetBleDetails
-        case 11: return .InternalBleHandlerNotAvailable
-        case 12: return .FailedToEstablishBleConnection
+        case 11: return .FailedToGetBleDetails
+        case 12: return .InternalBleHandlerNotAvailable
+        case 13: return .FailedToEstablishBleConnection
 
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -1383,41 +1364,44 @@ public struct FfiConverterTypeConnectErrors: FfiConverterRustBuffer {
         case .Unreachable:
             writeInt(&buf, Int32(1))
 
-        case .FailedToGetConnectionDetails:
+        case .NoFilesProvided:
             writeInt(&buf, Int32(2))
 
-        case .Declined:
+        case .FailedToGetConnectionDetails:
             writeInt(&buf, Int32(3))
 
-        case .FailedToGetTcpDetails:
+        case .Declined:
             writeInt(&buf, Int32(4))
 
-        case .FailedToGetSocketAddress:
+        case .FailedToGetTcpDetails:
             writeInt(&buf, Int32(5))
 
-        case .FailedToOpenTcpStream:
+        case .FailedToGetSocketAddress:
             writeInt(&buf, Int32(6))
 
-        case let .FailedToEncryptStream(error):
+        case .FailedToOpenTcpStream:
             writeInt(&buf, Int32(7))
-            FfiConverterString.write(error, into: &buf)
 
-        case let .FailedToDetermineFileSize(error):
+        case let .FailedToEncryptStream(error):
             writeInt(&buf, Int32(8))
             FfiConverterString.write(error, into: &buf)
 
-        case let .FailedToGetTransferRequestResponse(error):
+        case let .FailedToDetermineFileSize(error):
             writeInt(&buf, Int32(9))
             FfiConverterString.write(error, into: &buf)
 
-        case .FailedToGetBleDetails:
+        case let .FailedToGetTransferRequestResponse(error):
             writeInt(&buf, Int32(10))
+            FfiConverterString.write(error, into: &buf)
 
-        case .InternalBleHandlerNotAvailable:
+        case .FailedToGetBleDetails:
             writeInt(&buf, Int32(11))
 
-        case .FailedToEstablishBleConnection:
+        case .InternalBleHandlerNotAvailable:
             writeInt(&buf, Int32(12))
+
+        case .FailedToEstablishBleConnection:
+            writeInt(&buf, Int32(13))
         }
     }
 }
@@ -1560,6 +1544,7 @@ public enum ReceiveProgressState {
     case receiving(
         progress: Double
     )
+    case extracting
     case cancelled
     case finished
 }
@@ -1578,9 +1563,11 @@ public struct FfiConverterTypeReceiveProgressState: FfiConverterRustBuffer {
                 progress: FfiConverterDouble.read(from: &buf)
             )
 
-        case 4: return .cancelled
+        case 4: return .extracting
 
-        case 5: return .finished
+        case 5: return .cancelled
+
+        case 6: return .finished
 
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -1598,11 +1585,14 @@ public struct FfiConverterTypeReceiveProgressState: FfiConverterRustBuffer {
             writeInt(&buf, Int32(3))
             FfiConverterDouble.write(progress, into: &buf)
 
-        case .cancelled:
+        case .extracting:
             writeInt(&buf, Int32(4))
 
-        case .finished:
+        case .cancelled:
             writeInt(&buf, Int32(5))
+
+        case .finished:
+            writeInt(&buf, Int32(6))
         }
     }
 }
@@ -1626,6 +1616,7 @@ public enum SendProgressState {
     case connectionMediumUpdate(
         medium: ConnectionMedium
     )
+    case compressing
     case transferring(
         progress: Double
     )
@@ -1650,15 +1641,17 @@ public struct FfiConverterTypeSendProgressState: FfiConverterRustBuffer {
                 medium: FfiConverterTypeConnectionMedium.read(from: &buf)
             )
 
-        case 5: return try .transferring(
+        case 5: return .compressing
+
+        case 6: return try .transferring(
                 progress: FfiConverterDouble.read(from: &buf)
             )
 
-        case 6: return .cancelled
+        case 7: return .cancelled
 
-        case 7: return .finished
+        case 8: return .finished
 
-        case 8: return .declined
+        case 9: return .declined
 
         default: throw UniffiInternalError.unexpectedEnumCase
         }
@@ -1679,18 +1672,21 @@ public struct FfiConverterTypeSendProgressState: FfiConverterRustBuffer {
             writeInt(&buf, Int32(4))
             FfiConverterTypeConnectionMedium.write(medium, into: &buf)
 
-        case let .transferring(progress):
+        case .compressing:
             writeInt(&buf, Int32(5))
+
+        case let .transferring(progress):
+            writeInt(&buf, Int32(6))
             FfiConverterDouble.write(progress, into: &buf)
 
         case .cancelled:
-            writeInt(&buf, Int32(6))
-
-        case .finished:
             writeInt(&buf, Int32(7))
 
-        case .declined:
+        case .finished:
             writeInt(&buf, Int32(8))
+
+        case .declined:
+            writeInt(&buf, Int32(9))
         }
     }
 }
@@ -2626,6 +2622,28 @@ private struct FfiConverterOptionCallbackInterfaceSendProgressDelegate: FfiConve
     }
 }
 
+private struct FfiConverterSequenceString: FfiConverterRustBuffer {
+    typealias SwiftType = [String]
+
+    public static func write(_ value: [String], into buf: inout [UInt8]) {
+        let len = Int32(value.count)
+        writeInt(&buf, len)
+        for item in value {
+            FfiConverterString.write(item, into: &buf)
+        }
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> [String] {
+        let len: Int32 = try readInt(&buf)
+        var seq = [String]()
+        seq.reserveCapacity(Int(len))
+        for _ in 0 ..< len {
+            try seq.append(FfiConverterString.read(from: &buf))
+        }
+        return seq
+    }
+}
+
 private struct FfiConverterSequenceTypeDevice: FfiConverterRustBuffer {
     typealias SwiftType = [Device]
 
@@ -2796,7 +2814,7 @@ private var initializationResult: InitializationResult {
     if uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_restart_server() != 50803 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_send_file() != 38505 {
+    if uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_send_files() != 42283 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_intershare_sdk_ffi_checksum_method_internalnearbyserver_set_ble_connection_details() != 15099 {

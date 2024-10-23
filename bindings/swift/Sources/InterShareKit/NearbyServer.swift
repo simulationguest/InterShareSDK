@@ -109,8 +109,8 @@ public class NearbyServer {
 
     @available(macOS 13.0, *)
     @available(iOS 14.0, *)
-    public func sendFile(to device: Device, url: String, progress: SendProgressDelegate?) async throws {
-        try await internalHandler.sendFile(receiver: device, filePath: url, progressDelegate: progress)
+    public func send(urls: [String], to device: Device, progress: SendProgressDelegate?) async throws {
+        try await internalHandler.sendFiles(receiver: device, filePaths: urls, progressDelegate: progress)
     }
 
     public func stop() throws {

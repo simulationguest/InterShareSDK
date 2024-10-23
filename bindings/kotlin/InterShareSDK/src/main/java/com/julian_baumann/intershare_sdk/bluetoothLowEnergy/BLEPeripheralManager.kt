@@ -19,10 +19,7 @@ class BlePermissionNotGrantedException : Exception()
 val discoveryServiceUUID: UUID = UUID.fromString(getBleServiceUuid())
 val discoveryCharacteristicUUID: UUID = UUID.fromString(getBleCharacteristicUuid())
 
-internal class BLEPeripheralManager(private val context: Context, private val internalNearbyServer: InternalNearbyServer) : BleServerImplementationDelegate {
-    private val bluetoothManager: BluetoothManager by lazy {
-        context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    }
+internal class BLEPeripheralManager(private val context: Context, private val internalNearbyServer: InternalNearbyServer, private val bluetoothManager: BluetoothManager) : BleServerImplementationDelegate {
 
     private var bluetoothGattServer: BluetoothGattServer? = null
     private var bluetoothL2CAPServer: BluetoothServerSocket? = null
