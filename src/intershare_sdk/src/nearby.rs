@@ -391,8 +391,6 @@ impl NearbyServer {
         let mut all_written: usize = 0;
 
         while let Ok(read_size) = tmp_file.read(&mut buffer) {
-            println!("Sending {:?} bytes", read_size);
-
             if read_size == 0 {
                 break;
             }
