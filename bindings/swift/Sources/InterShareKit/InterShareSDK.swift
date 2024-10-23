@@ -476,7 +476,7 @@ private struct FfiConverterData: FfiConverterRustBuffer {
 }
 
 public protocol ConnectionRequestProtocol: AnyObject {
-    func accept()
+    func accept() -> [String]?
 
     func cancel() async
 
@@ -527,11 +527,13 @@ open class ConnectionRequest:
         try! rustCall { uniffi_intershare_sdk_ffi_fn_free_connectionrequest(pointer, $0) }
     }
 
-    open func accept() {
-        try!
-            rustCall {
-                uniffi_intershare_sdk_ffi_fn_method_connectionrequest_accept(self.uniffiClonePointer(), $0)
-            }
+    open func accept() -> [String]? {
+        return try! FfiConverterOptionSequenceString.lift(
+            try!
+                rustCall {
+                    uniffi_intershare_sdk_ffi_fn_method_connectionrequest_accept(self.uniffiClonePointer(), $0)
+                }
+        )
     }
 
     open func cancel() async {
@@ -2622,6 +2624,27 @@ private struct FfiConverterOptionCallbackInterfaceSendProgressDelegate: FfiConve
     }
 }
 
+private struct FfiConverterOptionSequenceString: FfiConverterRustBuffer {
+    typealias SwiftType = [String]?
+
+    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
+        guard let value = value else {
+            writeInt(&buf, Int8(0))
+            return
+        }
+        writeInt(&buf, Int8(1))
+        FfiConverterSequenceString.write(value, into: &buf)
+    }
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> SwiftType {
+        switch try readInt(&buf) as Int8 {
+        case 0: return nil
+        case 1: return try FfiConverterSequenceString.read(from: &buf)
+        default: throw UniffiInternalError.unexpectedOptionalTag
+        }
+    }
+}
+
 private struct FfiConverterSequenceString: FfiConverterRustBuffer {
     typealias SwiftType = [String]
 
@@ -2751,7 +2774,7 @@ private var initializationResult: InitializationResult {
     if uniffi_intershare_sdk_ffi_checksum_func_get_ble_service_uuid() != 25811 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_accept() != 19557 {
+    if uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_accept() != 5403 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_cancel() != 53377 {

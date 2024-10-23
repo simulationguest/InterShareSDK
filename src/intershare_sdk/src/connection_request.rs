@@ -105,7 +105,7 @@ impl ConnectionRequest {
         self.variables.write().await.should_cancel = true;
     }
 
-    pub fn accept(&self) {
+    pub fn accept(&self) -> Option<Vec<String>> {
         self.update_progress(ReceiveProgressState::Handshake);
         let mut connection_guard = self.connection.lock().unwrap();
         let mut stream = Stream::new(&mut *connection_guard);
@@ -114,17 +114,17 @@ impl ConnectionRequest {
             accepted: true
         });
 
-        match self.get_intent() {
+        return match self.get_intent() {
             Intent::FileTransfer(file_transfer) => self.handle_file(connection_guard, file_transfer),
             Intent::Clipboard(clipboard) => self.handle_clipboard(clipboard)
         };
     }
 
-    fn handle_clipboard(&self, _clipboard_transfer_intent: ClipboardTransferIntent) {
+    fn handle_clipboard(&self, _clipboard_transfer_intent: ClipboardTransferIntent) -> Option<Vec<String>> {
         panic!("Not implemented yet");
     }
 
-    fn handle_file(&self, mut stream: MutexGuard<Box<dyn EncryptedReadWrite>>, file_transfer: FileTransferIntent) {
+    fn handle_file(&self, mut stream: MutexGuard<Box<dyn EncryptedReadWrite>>, file_transfer: FileTransferIntent) -> Option<Vec<String>> {
         let mut named_temp_file: Option<File> = None;
         let mut file_path: Option<String> = None;
 
@@ -172,14 +172,24 @@ impl ConnectionRequest {
         } else {
             if file_transfer.file_count == 1 {
                 self.update_progress(ReceiveProgressState::Finished);
+
+                return Some(vec![file_path.unwrap()])
             } else {
                 self.update_progress(ReceiveProgressState::Extracting);
-                if let Err(error) = unzip_file(named_temp_file.unwrap(), &self.file_storage) {
-                    println!("Error {:?}", error);
-                }
 
-                self.update_progress(ReceiveProgressState::Finished);
+                let zip_result = unzip_file(named_temp_file.unwrap(), &self.file_storage);
+
+                if let Ok(files) = zip_result {
+                    self.update_progress(ReceiveProgressState::Finished);
+
+                    return Some(files);
+                } else if let Err(error) = zip_result {
+                    println!("Error {:?}", error);
+                    self.update_progress(ReceiveProgressState::Cancelled);
+                }
             }
-        }
+        };
+
+        return None;
     }
 }
