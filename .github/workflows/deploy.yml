@@ -26,7 +26,7 @@ jobs:
     - name: Run setup
       shell: pwsh
       run: |
-          .\setup.sh
+          .\setup.ps1
   
     - name: Install Protoc
       uses: arduino/setup-protoc@v3
