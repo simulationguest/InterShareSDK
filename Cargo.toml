@@ -6,3 +6,7 @@ members = [
     "src/intershare_sdk_ffi",
     "src/protocol"
 ]
+
+exclude = [
+    "src/intershare_windows"
+]
