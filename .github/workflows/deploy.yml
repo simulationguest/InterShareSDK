@@ -23,9 +23,21 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Build
+    - name: Run setup
+      shell: pwsh
       run: |
-        dotnet build -c Release ./bindings/csharp/InterShareSdk
+          .\setup.sh
+  
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v3
+      with:
+        version: "23.3"
+
+    - name: Build
+      shell: pwsh
+      run: |
+        .\generate-csharp.ps1
+        dotnet build -c Release .\bindings\csharp\InterShareSdk
 
     - name: Pack
       run: dotnet pack bindings/csharp/InterShareSdk/InterShareSdk.csproj -c Release -p:PackageVersion='${{ github.event.inputs.version }}' --output packages
