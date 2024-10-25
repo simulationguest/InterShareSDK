@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Condition="$([MSBuild]::IsOsPlatform('Windows'))"
+          Include="../../../src/intershare_windows/target/x86_64-pc-windows-msvc/release/intershare_sdk_ffi.dll"
+          Pack="true"
+          PackagePath="runtimes/win-x64/native/"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

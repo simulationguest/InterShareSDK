@@ -162,7 +162,7 @@ impl NearbyServer {
 
                     tcp_server.start_loop();
 
-                    self.set_tcp_details(TcpConnectionInfo {
+                    self.variables.write().await.device_connection_info.tcp = Some(TcpConnectionInfo {
                         hostname: my_local_ip,
                         port: tcp_server.port as u32,
                     });

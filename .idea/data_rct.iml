@@ -6,6 +6,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/intershare_sdk/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/intershare_sdk_ffi/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/protocol/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/intershare_windows/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/intershare_windows/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -10,15 +10,13 @@ pub use intershare_sdk::encryption::EncryptedStream;
 pub use intershare_sdk::nearby::{ConnectionMedium, SendProgressState, SendProgressDelegate, BleServerImplementationDelegate, L2CapDelegate, NearbyConnectionDelegate, NearbyServer};
 pub use intershare_sdk::nearby::ConnectionIntentType;
 pub use intershare_sdk::protocol::communication::FileTransferIntent;
-use intershare_sdk::protocol::discovery::{BluetoothLeConnectionInfo, TcpConnectionInfo};
 pub use intershare_sdk::stream::NativeStreamDelegate;
 pub use intershare_sdk::transmission::TransmissionSetupError;
 pub use intershare_sdk::errors::*;
 pub use intershare_sdk::*;
+use intershare_sdk::protocol::discovery::{BluetoothLeConnectionInfo, TcpConnectionInfo};
 
-#[cfg(feature = "sync")]
-pub mod sync_code;
-#[cfg(not(feature = "sync"))]
+
 pub mod async_code;
 
 #[derive(Debug, thiserror::Error)]
