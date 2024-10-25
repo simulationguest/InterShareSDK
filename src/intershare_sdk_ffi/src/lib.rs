@@ -14,6 +14,8 @@ pub use intershare_sdk::stream::NativeStreamDelegate;
 pub use intershare_sdk::transmission::TransmissionSetupError;
 pub use intershare_sdk::errors::*;
 pub use intershare_sdk::*;
+use intershare_sdk::protocol::discovery::{BluetoothLeConnectionInfo, TcpConnectionInfo};
+
 
 pub mod async_code;
 

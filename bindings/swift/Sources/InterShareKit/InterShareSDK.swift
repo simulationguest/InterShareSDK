@@ -478,7 +478,7 @@ private struct FfiConverterData: FfiConverterRustBuffer {
 public protocol ConnectionRequestProtocol: AnyObject {
     func accept() -> [String]?
 
-    func cancel() async
+    func cancel()
 
     func decline()
 
@@ -536,19 +536,11 @@ open class ConnectionRequest:
         )
     }
 
-    open func cancel() async {
-        return try! await uniffiRustCallAsync(
-            rustFutureFunc: {
-                uniffi_intershare_sdk_ffi_fn_method_connectionrequest_cancel(
-                    self.uniffiClonePointer()
-                )
-            },
-            pollFunc: ffi_intershare_sdk_ffi_rust_future_poll_void,
-            completeFunc: ffi_intershare_sdk_ffi_rust_future_complete_void,
-            freeFunc: ffi_intershare_sdk_ffi_rust_future_free_void,
-            liftFunc: { $0 },
-            errorHandler: nil
-        )
+    open func cancel() {
+        try!
+            rustCall {
+                uniffi_intershare_sdk_ffi_fn_method_connectionrequest_cancel(self.uniffiClonePointer(), $0)
+            }
     }
 
     open func decline() {
@@ -2777,7 +2769,7 @@ private var initializationResult: InitializationResult {
     if uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_accept() != 5403 {
         return InitializationResult.apiChecksumMismatch
     }
-    if uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_cancel() != 53377 {
+    if uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_cancel() != 18599 {
         return InitializationResult.apiChecksumMismatch
     }
     if uniffi_intershare_sdk_ffi_checksum_method_connectionrequest_decline() != 63855 {
