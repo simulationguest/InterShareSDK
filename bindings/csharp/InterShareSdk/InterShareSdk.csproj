@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <None Condition="$([MSBuild]::IsOsPlatform('Windows'))"
-          Include="../../../target/x86_64-pc-windows-msvc/release/intershare_sdk_ffi.dll"
+          Include="../../../src/intershare_windows/target/x86_64-pc-windows-msvc/release/intershare_sdk_ffi.dll"
           Pack="true"
           PackagePath="runtimes/win-x64/native/"
           CopyToOutputDirectory="PreserveNewest" />
