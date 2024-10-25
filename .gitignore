@@ -17,3 +17,8 @@ DerivedData/
 .netrc
 .out
 InterShareSDKFFI.xcframework
+InterShareSdk.sln.DotSettings.user
+bindings/csharp/InterShareSdk/bin
+bindings/csharp/InterShareSdk/obj
+bindings/csharp/Tests/bin
+bindings/csharp/Tests/obj

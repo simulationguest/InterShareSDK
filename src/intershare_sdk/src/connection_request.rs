@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::io::{Read, Write};
 use std::sync::{Arc, Mutex, MutexGuard};
+use std::sync::atomic::{AtomicBool, Ordering};
 use prost_stream::Stream;
 use protocol::communication::transfer_request::Intent;
 use protocol::communication::{ClipboardTransferIntent, FileTransferIntent, TransferRequest, TransferRequestResponse};
@@ -19,77 +20,77 @@ pub enum ReceiveProgressState {
     Cancelled,
     Finished
 }
+
 pub trait ReceiveProgressDelegate: Send + Sync + Debug {
     fn progress_changed(&self, progress: ReceiveProgressState);
 }
 
 struct SharedVariables {
     receive_progress_delegate: Option<Box<dyn ReceiveProgressDelegate>>,
-    should_cancel: bool
 }
 
 pub struct ConnectionRequest {
     transfer_request: TransferRequest,
     connection: Arc<Mutex<Box<dyn EncryptedReadWrite>>>,
     file_storage: String,
+    should_cancel: AtomicBool,
     variables: Arc<RwLock<SharedVariables>>
 }
 
 impl ConnectionRequest {
     pub fn new(transfer_request: TransferRequest, connection: Box<dyn EncryptedReadWrite>, file_storage: String) -> Self {
-        return Self {
+        Self {
             transfer_request,
             connection: Arc::new(Mutex::new(connection)),
             file_storage,
+            should_cancel: AtomicBool::new(false),
             variables: Arc::new(RwLock::new(SharedVariables {
-                receive_progress_delegate: None,
-                should_cancel: false
+                receive_progress_delegate: None
             }))
         }
     }
 
     pub fn set_progress_delegate(&self, delegate: Box<dyn ReceiveProgressDelegate>) {
-        self.variables.blocking_write().receive_progress_delegate = Some(delegate);
+        let mut variables = self.variables.blocking_write();
+        variables.receive_progress_delegate = Some(delegate);
     }
 
     pub fn get_sender(&self) -> Device {
-        return self.transfer_request.clone().device.expect("Device information missing");
+        self.transfer_request.device.clone().expect("Device information missing")
     }
 
     pub fn get_intent(&self) -> Intent {
-        return self.transfer_request.clone().intent.expect("Intent information missing");
+        self.transfer_request.intent.clone().expect("Intent information missing")
     }
 
     pub fn get_intent_type(&self) -> ConnectionIntentType {
-        return match self.transfer_request.clone().intent.expect("Intent information missing") {
+        match self.transfer_request.intent.clone().expect("Intent information missing") {
             Intent::FileTransfer(_) => ConnectionIntentType::FileTransfer,
             Intent::Clipboard(_) => ConnectionIntentType::FileTransfer
-        };
+        }
     }
 
     pub fn get_file_transfer_intent(&self) -> Option<FileTransferIntent> {
-        return match self.transfer_request.clone().intent.expect("Intent information missing") {
+        match self.transfer_request.intent.clone().expect("Intent information missing") {
             Intent::FileTransfer(file_transfer_intent) => Some(file_transfer_intent),
             Intent::Clipboard(_) => None
-        };
+        }
     }
 
     pub fn get_clipboard_intent(&self) -> Option<ClipboardTransferIntent> {
-        return match self.transfer_request.clone().intent.expect("Intent information missing") {
+        match self.transfer_request.intent.clone().expect("Intent information missing") {
             Intent::FileTransfer(_) => None,
             Intent::Clipboard(clipboard_intent) => Some(clipboard_intent)
-        };
+        }
     }
 
     pub fn decline(&self) {
-        let mut connection_guard = self.connection.lock().unwrap();
-        let mut stream = Stream::new(&mut *connection_guard);
+        if let Ok(mut connection_guard) = self.connection.lock() {
+            let mut stream = Stream::new(&mut *connection_guard);
 
-        let _ = stream.send(&TransferRequestResponse {
-            accepted: false
-        });
-
-        connection_guard.close();
+            let _ = stream.send(&TransferRequestResponse { accepted: false });
+            connection_guard.close();
+        }
     }
 
     fn update_progress(&self, new_state: ReceiveProgressState) {
@@ -98,24 +99,25 @@ impl ConnectionRequest {
         }
     }
 
-    pub async fn cancel(&self) {
-        println!("trying to cancel");
-        self.variables.write().await.should_cancel = true;
+    pub fn cancel(&self) {
+        self.should_cancel.store(true, Ordering::Relaxed);
     }
 
     pub fn accept(&self) -> Option<Vec<String>> {
         self.update_progress(ReceiveProgressState::Handshake);
-        let mut connection_guard = self.connection.lock().unwrap();
-        let mut stream = Stream::new(&mut *connection_guard);
 
-        let _ = stream.send(&TransferRequestResponse {
-            accepted: true
-        });
+        if let Ok(mut connection_guard) = self.connection.lock() {
+            let mut stream = Stream::new(&mut *connection_guard);
 
-        return match self.get_intent() {
-            Intent::FileTransfer(file_transfer) => self.handle_file(connection_guard, file_transfer),
-            Intent::Clipboard(clipboard) => self.handle_clipboard(clipboard)
-        };
+            let _ = stream.send(&TransferRequestResponse { accepted: true });
+
+            match self.get_intent() {
+                Intent::FileTransfer(file_transfer) => self.handle_file(connection_guard, file_transfer),
+                Intent::Clipboard(clipboard) => self.handle_clipboard(clipboard)
+            }
+        } else {
+            None
+        }
     }
 
     fn handle_clipboard(&self, _clipboard_transfer_intent: ClipboardTransferIntent) -> Option<Vec<String>> {
@@ -130,11 +132,7 @@ impl ConnectionRequest {
         let mut all_read = 0.0;
 
         while let Ok(read_size) = stream.read(&mut buffer) {
-            if self.variables.blocking_read().should_cancel {
-                break;
-            }
-
-            if read_size <= 0 {
+            if self.should_cancel.load(Ordering::Relaxed) || read_size == 0 {
                 break;
             }
 
@@ -146,9 +144,7 @@ impl ConnectionRequest {
             let progress = all_read / file_transfer.file_size as f64;
             self.update_progress(ReceiveProgressState::Receiving { progress });
 
-            if all_read == file_transfer.file_size as f64 {
-                break;
-            }
+            if all_read >= file_transfer.file_size as f64 { break; }
         }
 
         stream.close();
@@ -156,21 +152,20 @@ impl ConnectionRequest {
         if all_read < file_transfer.file_size as f64 {
             let _ = named_file.close();
             self.update_progress(ReceiveProgressState::Cancelled);
-        } else {
-            self.update_progress(ReceiveProgressState::Extracting);
+            return None;
+        }
 
-            let zip_result = unzip_file(zip_file, &self.file_storage);
-
-            if let Ok(files) = zip_result {
+        self.update_progress(ReceiveProgressState::Extracting);
+        match unzip_file(zip_file, &self.file_storage) {
+            Ok(files) => {
                 self.update_progress(ReceiveProgressState::Finished);
-
-                return Some(files);
-            } else if let Err(error) = zip_result {
+                Some(files)
+            }
+            Err(error) => {
                 println!("Error {:?}", error);
                 self.update_progress(ReceiveProgressState::Cancelled);
+                None
             }
-        };
-
-        return None;
+        }
     }
 }

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
+name = "intershare_sdk_ffi"
 crate-type = ["lib", "staticlib", "cdylib"]
 
 [[bin]]
@@ -17,7 +18,8 @@ windows = { version = "0.58.0", features = ["Devices_Bluetooth", "Devices_Blueto
 winapi = { version = "0.3.9", features = ["winsock2"] }
 widestring = "1.1.0"
 futures = "0.3.31"
-uniffi = { version = "0.28.2", features = ["cli", "tokio", "default"] }
+uniffi = { version = "0.25.3", features = ["cli", "tokio", "default"] }
+dirs = "5.0.1"
 
 [build-dependencies]
-uniffi = { git = "https://github.com/julian-baumann/uniffi-rs", rev = "9bbf2d2",  features = ["build"] }
+uniffi = { version = "0.25.3",  features = ["build"] }

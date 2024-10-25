@@ -1,3 +1,4 @@
 [bindings.csharp]
 cdylib_name = "intershare_sdk_ffi"
-namespace = "InterShareSDK"
+namespace = "InterShareSdk"
+access_modifier = "public"

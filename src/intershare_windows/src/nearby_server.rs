@@ -1,11 +1,12 @@
 use crate::ble::ble_server::BleServer;
-use intershare_sdk::nearby::NearbyConnectionDelegate;
+use intershare_sdk::nearby::{NearbyConnectionDelegate, SendProgressDelegate};
 pub use intershare_sdk::nearby::NearbyServer as InternalNearbyServer;
 use intershare_sdk::Device;
 use std::sync::Arc;
+use dirs::download_dir;
 use tokio::runtime::Runtime;
+use intershare_sdk::errors::ConnectErrors;
 
-#[uniffi::export()]
 pub struct NearbyServer {
     runtime: Runtime,
     internal_nearby_server: Arc<InternalNearbyServer>
@@ -13,7 +14,10 @@ pub struct NearbyServer {
 
 impl NearbyServer {
     pub fn new(my_device: Device, delegate: Option<Box<dyn NearbyConnectionDelegate>>) -> NearbyServer {
-        let nearby = Arc::new(InternalNearbyServer::new(my_device, "TODO".to_string(), delegate));
+        let downloads_dir = download_dir().expect("Failed to get downloads directory").to_string_lossy().to_string();
+        println!("Downloads directory: {}", downloads_dir);
+        
+        let nearby = Arc::new(InternalNearbyServer::new(my_device, downloads_dir, delegate));
         let ble_server = BleServer::new(Arc::clone(&nearby))
             .expect("Failed to initialize BLE Server");
 
@@ -31,5 +35,17 @@ impl NearbyServer {
 
     pub fn start(&self) {
         self.runtime.block_on(self.internal_nearby_server.start());
+    }
+
+    pub fn stop(&self) {
+        self.internal_nearby_server.stop()
+    }
+
+    pub fn restart_server(&self) {
+        self.runtime.block_on(self.internal_nearby_server.restart_server());
+    }
+
+    pub fn send_files(&self, receiver: Device, file_paths: Vec<String>, progress_delegate: Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
+        return self.runtime.block_on(self.internal_nearby_server.send_files(receiver, file_paths, progress_delegate))
     }
 }

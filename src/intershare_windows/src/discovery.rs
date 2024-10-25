@@ -2,16 +2,16 @@ use crate::ble::ble_client::BleClient;
 pub use intershare_sdk::discovery::Discovery as InternalDiscovery;
 use intershare_sdk::{Device, DiscoveryDelegate};
 use std::sync::{Arc, Mutex};
+use intershare_sdk::errors::DiscoverySetupError;
 
 pub struct Discovery {
     internal_discovery: Arc<Mutex<InternalDiscovery>>,
 }
 
 impl Discovery {
-    pub fn new(delegate: Option<Box<dyn DiscoveryDelegate>>) -> Self {
+    pub fn new(delegate: Option<Box<dyn DiscoveryDelegate>>) -> Result<Self, DiscoverySetupError> {
         let internal_discovery = Arc::new(Mutex::new(
-            InternalDiscovery::new(delegate)
-                .expect("Failed to initialize internal discovery"),
+            InternalDiscovery::new(delegate)?,
         ));
 
         let ble_implementation = BleClient::new(internal_discovery.clone());
@@ -21,9 +21,9 @@ impl Discovery {
             internal_discovery_mut.add_ble_implementation(Box::new(ble_implementation));
         }
 
-        Self {
+        Ok(Self {
             internal_discovery,
-        }
+        })
     }
 
     pub fn get_devices(&self) -> Vec<Device> {
