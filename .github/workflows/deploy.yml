@@ -12,7 +12,30 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  publish:
+  publish-dotnet:
+    name: Publish Windows .NET NuGet
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Build
+      run: |
+        dotnet build -c Release ./bindings/csharp/InterShareSdk
+
+    - name: Pack
+      run: dotnet pack bindings/csharp/InterShareSdk/InterShareSdk.csproj -c Release -p:PackageVersion='${{ github.event.inputs.version }}' --output packages
+
+    - name: Upload to GitHub registry
+      run: |
+        dotnet nuget add source --username InterShare --password "${{ secrets.GITHUB_TOKEN }}" --store-password-in-clear-text --name github "https://nuget.pkg.github.com/InterShare/index.json"
+        dotnet nuget push "packages/InterShareSdk.${{ github.event.inputs.version }}.nupkg" --api-key "${{ secrets.GITHUB_TOKEN }}" --source "github"
+
+  publish-android:
       name: Publish Android library
       runs-on: ubuntu-latest
       permissions:
@@ -53,3 +76,20 @@ jobs:
             rustup target add x86_64-linux-android x86_64-unknown-linux-gnu aarch64-linux-android armv7-linux-androideabi i686-linux-android
             cd bindings/kotlin
             ./gradlew clean build publish
+
+  create-release:
+    name: Create Realase
+    needs: [publish-android, publish-dotnet]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release strings
+      id: release_strings
+      run: |
+        echo "RELEASE_TAG=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        echo "RELEASE_NAME=Version ${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.RELEASE_TAG }}
+        name: ${{ env.RELEASE_NAME }}
