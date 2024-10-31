@@ -13,5 +13,11 @@
           Pack="true"
           PackagePath="runtimes/win-x64/native/"
           CopyToOutputDirectory="PreserveNewest" />
+
+    <None Condition="$([MSBuild]::IsOsPlatform('Windows'))"
+          Include="../../../src/intershare_windows/target/aarch64-pc-windows-msvc/release/intershare_sdk_ffi.dll"
+          Pack="true"
+          PackagePath="runtimes/win-arm/native/"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
