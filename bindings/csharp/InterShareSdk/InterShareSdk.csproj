@@ -17,7 +17,7 @@
     <None Condition="$([MSBuild]::IsOsPlatform('Windows'))"
           Include="../../../src/intershare_windows/target/aarch64-pc-windows-msvc/release/intershare_sdk_ffi.dll"
           Pack="true"
-          PackagePath="runtimes/win-arm/native/"
+          PackagePath="runtimes/win-arm64/native/"
           CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
