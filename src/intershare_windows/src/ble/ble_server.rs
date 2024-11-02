@@ -6,7 +6,7 @@ use intershare_sdk::protocol::prost::Message;
 use intershare_sdk::{BLE_CHARACTERISTIC_UUID, BLE_SERVICE_UUID};
 use std::error::Error;
 use std::fmt::{Debug, Formatter};
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use windows::{
     core::{Result as WinResult, GUID},
     Devices::Bluetooth::GenericAttributeProfile::*,
@@ -68,25 +68,16 @@ fn setup_gatt_server(nearby_server: Arc<InternalNearbyServer>) -> WinResult<Gatt
 }
 
 pub struct BleServer {
-    gatt_service_provider: GattServiceProvider
+    nearby_server: Arc<InternalNearbyServer>,
+    gatt_service_provider: RwLock<Option<GattServiceProvider>>
 }
 
 impl BleServer {
     pub fn new(nearby_server: Arc<InternalNearbyServer>) -> Result<Self, Box<dyn Error>> {
-        let gatt_service_provider = setup_gatt_server(nearby_server)?;
-
         return Ok(Self {
-            gatt_service_provider
+            nearby_server,
+            gatt_service_provider: RwLock::new(None)
         });
-    }
-
-    pub fn ble_activated() -> bool {
-        let radio_access_status = Radio::RequestAccessAsync()
-            .expect("Failed to request access")
-            .get()
-            .expect("Failed to await result for RequestAccessAsync");
-
-        return radio_access_status.0 == 1;
     }
 }
 
@@ -98,13 +89,27 @@ impl Debug for BleServer {
 
 impl BleServerImplementationDelegate for BleServer {
     fn start_server(&self) {
+        let gatt_service_provider = setup_gatt_server(self.nearby_server.clone()).expect("Failed to start GATT server");
+
+        let mut writable_gatt_service = self.gatt_service_provider
+            .write()
+            .expect("Failed to unwrap gatt_service_provider");
+
+        let service_provider = writable_gatt_service.insert(gatt_service_provider);
+
         let adv_parameters = GattServiceProviderAdvertisingParameters::new().expect("Failed to create new GattServiceProviderAdvertisingParameters");
         adv_parameters.SetIsConnectable(true).expect("Failed to set IsConnectable");
         adv_parameters.SetIsDiscoverable(true).expect("Failed to set IsDiscoverable");
-        self.gatt_service_provider.StartAdvertisingWithParameters(&adv_parameters).expect("Failed to start Advertising");
+        service_provider.StartAdvertisingWithParameters(&adv_parameters).expect("Failed to start Advertising");
     }
 
     fn stop_server(&self) {
-        self.gatt_service_provider.StopAdvertising().expect("Failed to stop advertising");
+        let gatt_service_provider = self.gatt_service_provider
+            .read()
+            .expect("Failed to lock GattServiceProvider");
+
+        if let Some(gatt_service_provider) = gatt_service_provider.as_ref() {
+            gatt_service_provider.StopAdvertising().expect("Failed to stop advertising");
+        }
     }
 }

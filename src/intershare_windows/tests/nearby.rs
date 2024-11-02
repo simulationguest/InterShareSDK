@@ -4,7 +4,7 @@ use std::time::Duration;
 use intershare_sdk::connection_request::ConnectionRequest;
 use intershare_sdk::Device;
 use intershare_sdk::nearby::NearbyConnectionDelegate;
-use intershare_windows::nearby_server::{NearbyServer};
+use intershare_windows::nearby_server::NearbyServer;
 
 #[derive(Debug)]
 struct ConnectionDelegate {}

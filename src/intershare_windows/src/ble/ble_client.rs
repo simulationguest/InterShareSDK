@@ -11,13 +11,13 @@ use windows::{
         },
         BluetoothLEDevice,
         GenericAttributeProfile::{
-            GattCharacteristic, GattCommunicationStatus,
+            GattCommunicationStatus,
         },
     },
     Foundation::TypedEventHandler,
     Storage::Streams::DataReader,
 };
-use tokio::runtime::{Handle, Runtime};
+use tokio::runtime::Handle;
 use windows::Win32::System::Com::{CoInitializeEx, COINIT_MULTITHREADED};
 use intershare_sdk::{BLE_CHARACTERISTIC_UUID, BLE_SERVICE_UUID};
 use intershare_sdk::discovery::BleDiscoveryImplementationDelegate;

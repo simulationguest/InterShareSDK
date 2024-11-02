@@ -18,13 +18,4 @@ pub use crate::discovery::{Discovery};
 pub use crate::nearby_server::{NearbyServer};
 pub use intershare_sdk::protocol::discovery::{BluetoothLeConnectionInfo, TcpConnectionInfo};
 
-// pub struct Test {
-// }
-// 
-// impl Test {
-//     fn new() {
-// 
-//         ConnectErrors
-//     }
-// }
 uniffi::include_scaffolding!("intershare_sdk");

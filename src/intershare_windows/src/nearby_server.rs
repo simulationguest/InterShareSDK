@@ -1,6 +1,6 @@
 use crate::ble::ble_server::BleServer;
 use intershare_sdk::nearby::{NearbyConnectionDelegate, SendProgressDelegate};
-pub use intershare_sdk::nearby::NearbyServer as InternalNearbyServer;
+use intershare_sdk::nearby::NearbyServer as InternalNearbyServer;
 use intershare_sdk::Device;
 use std::sync::Arc;
 use dirs::download_dir;
