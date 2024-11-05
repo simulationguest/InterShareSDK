@@ -89,5 +89,5 @@ pub enum DiscoverySetupError {
     UnableToSetupUdp,
 
     #[error("Unable to setup MDNS-SD Discovery")]
-    UnableToSetupMdns
+    UnableToSetupMdns,
 }

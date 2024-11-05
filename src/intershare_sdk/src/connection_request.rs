@@ -1,16 +1,18 @@
-use std::fmt::Debug;
-use std::io::{Read, Write};
-use std::sync::{Arc, Mutex, MutexGuard};
-use std::sync::atomic::{AtomicBool, Ordering};
+use crate::zip::unzip_file;
+use crate::BLE_BUFFER_SIZE;
+use crate::{encryption::EncryptedReadWrite, nearby::ConnectionIntentType};
 use prost_stream::Stream;
 use protocol::communication::transfer_request::Intent;
-use protocol::communication::{ClipboardTransferIntent, FileTransferIntent, TransferRequest, TransferRequestResponse};
+use protocol::communication::{
+    ClipboardTransferIntent, FileTransferIntent, TransferRequest, TransferRequestResponse,
+};
 use protocol::discovery::Device;
+use std::fmt::Debug;
+use std::io::{Read, Write};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex, MutexGuard};
 use tempfile::NamedTempFile;
 use tokio::sync::RwLock;
-use crate::{encryption::EncryptedReadWrite, nearby::ConnectionIntentType};
-use crate::zip::unzip_file;
-use crate::{BLE_BUFFER_SIZE};
 
 pub enum ReceiveProgressState {
     Unknown,
@@ -18,7 +20,7 @@ pub enum ReceiveProgressState {
     Receiving { progress: f64 },
     Extracting,
     Cancelled,
-    Finished
+    Finished,
 }
 
 pub trait ReceiveProgressDelegate: Send + Sync + Debug {
@@ -34,19 +36,23 @@ pub struct ConnectionRequest {
     connection: Arc<Mutex<Box<dyn EncryptedReadWrite>>>,
     file_storage: String,
     should_cancel: AtomicBool,
-    variables: Arc<RwLock<SharedVariables>>
+    variables: Arc<RwLock<SharedVariables>>,
 }
 
 impl ConnectionRequest {
-    pub fn new(transfer_request: TransferRequest, connection: Box<dyn EncryptedReadWrite>, file_storage: String) -> Self {
+    pub fn new(
+        transfer_request: TransferRequest,
+        connection: Box<dyn EncryptedReadWrite>,
+        file_storage: String,
+    ) -> Self {
         Self {
             transfer_request,
             connection: Arc::new(Mutex::new(connection)),
             file_storage,
             should_cancel: AtomicBool::new(false),
             variables: Arc::new(RwLock::new(SharedVariables {
-                receive_progress_delegate: None
-            }))
+                receive_progress_delegate: None,
+            })),
         }
     }
 
@@ -56,31 +62,52 @@ impl ConnectionRequest {
     }
 
     pub fn get_sender(&self) -> Device {
-        self.transfer_request.device.clone().expect("Device information missing")
+        self.transfer_request
+            .device
+            .clone()
+            .expect("Device information missing")
     }
 
     pub fn get_intent(&self) -> Intent {
-        self.transfer_request.intent.clone().expect("Intent information missing")
+        self.transfer_request
+            .intent
+            .clone()
+            .expect("Intent information missing")
     }
 
     pub fn get_intent_type(&self) -> ConnectionIntentType {
-        match self.transfer_request.intent.clone().expect("Intent information missing") {
+        match self
+            .transfer_request
+            .intent
+            .clone()
+            .expect("Intent information missing")
+        {
             Intent::FileTransfer(_) => ConnectionIntentType::FileTransfer,
-            Intent::Clipboard(_) => ConnectionIntentType::FileTransfer
+            Intent::Clipboard(_) => ConnectionIntentType::FileTransfer,
         }
     }
 
     pub fn get_file_transfer_intent(&self) -> Option<FileTransferIntent> {
-        match self.transfer_request.intent.clone().expect("Intent information missing") {
+        match self
+            .transfer_request
+            .intent
+            .clone()
+            .expect("Intent information missing")
+        {
             Intent::FileTransfer(file_transfer_intent) => Some(file_transfer_intent),
-            Intent::Clipboard(_) => None
+            Intent::Clipboard(_) => None,
         }
     }
 
     pub fn get_clipboard_intent(&self) -> Option<ClipboardTransferIntent> {
-        match self.transfer_request.intent.clone().expect("Intent information missing") {
+        match self
+            .transfer_request
+            .intent
+            .clone()
+            .expect("Intent information missing")
+        {
             Intent::FileTransfer(_) => None,
-            Intent::Clipboard(clipboard_intent) => Some(clipboard_intent)
+            Intent::Clipboard(clipboard_intent) => Some(clipboard_intent),
         }
     }
 
@@ -94,7 +121,9 @@ impl ConnectionRequest {
     }
 
     fn update_progress(&self, new_state: ReceiveProgressState) {
-        if let Some(receive_progress_delegate) = &self.variables.blocking_read().receive_progress_delegate {
+        if let Some(receive_progress_delegate) =
+            &self.variables.blocking_read().receive_progress_delegate
+        {
             receive_progress_delegate.progress_changed(new_state);
         }
     }
@@ -112,21 +141,32 @@ impl ConnectionRequest {
             let _ = stream.send(&TransferRequestResponse { accepted: true });
 
             match self.get_intent() {
-                Intent::FileTransfer(file_transfer) => self.handle_file(connection_guard, file_transfer),
-                Intent::Clipboard(clipboard) => self.handle_clipboard(clipboard)
+                Intent::FileTransfer(file_transfer) => {
+                    self.handle_file(connection_guard, file_transfer)
+                }
+                Intent::Clipboard(clipboard) => self.handle_clipboard(clipboard),
             }
         } else {
             None
         }
     }
 
-    fn handle_clipboard(&self, _clipboard_transfer_intent: ClipboardTransferIntent) -> Option<Vec<String>> {
+    fn handle_clipboard(
+        &self,
+        _clipboard_transfer_intent: ClipboardTransferIntent,
+    ) -> Option<Vec<String>> {
         panic!("Not implemented yet");
     }
 
-    fn handle_file(&self, mut stream: MutexGuard<Box<dyn EncryptedReadWrite>>, file_transfer: FileTransferIntent) -> Option<Vec<String>> {
+    fn handle_file(
+        &self,
+        mut stream: MutexGuard<Box<dyn EncryptedReadWrite>>,
+        file_transfer: FileTransferIntent,
+    ) -> Option<Vec<String>> {
         let named_file = NamedTempFile::new().expect("Failed to create temporary ZIP file.");
-        let mut zip_file = named_file.reopen().expect("Failed to reopen temporary ZIP file");
+        let mut zip_file = named_file
+            .reopen()
+            .expect("Failed to reopen temporary ZIP file");
 
         let mut buffer = [0; BLE_BUFFER_SIZE];
         let mut all_read = 0.0;
@@ -138,13 +178,16 @@ impl ConnectionRequest {
 
             all_read += read_size as f64;
 
-            zip_file.write_all(&buffer[..read_size])
+            zip_file
+                .write_all(&buffer[..read_size])
                 .expect("Failed to write file to disk");
 
             let progress = all_read / file_transfer.file_size as f64;
             self.update_progress(ReceiveProgressState::Receiving { progress });
 
-            if all_read >= file_transfer.file_size as f64 { break; }
+            if all_read >= file_transfer.file_size as f64 {
+                break;
+            }
         }
 
         stream.close();

@@ -1,23 +1,24 @@
+use crate::errors::DiscoverySetupError;
+use crate::init_logger;
+use protocol::discovery::device_discovery_message::Content;
+use protocol::discovery::{Device, DeviceConnectionInfo, DeviceDiscoveryMessage};
+use protocol::prost::Message;
+use protocol::DiscoveryDelegate;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::sync::{Arc, Mutex, OnceLock, RwLock};
-use protocol::DiscoveryDelegate;
-use protocol::discovery::{DeviceConnectionInfo, DeviceDiscoveryMessage, Device};
-use protocol::discovery::device_discovery_message::Content;
-use protocol::prost::Message;
-use crate::errors::DiscoverySetupError;
-use crate::init_logger;
 
 pub trait BleDiscoveryImplementationDelegate: Send + Sync + Debug {
     fn start_scanning(&self);
     fn stop_scanning(&self);
 }
 
-static DISCOVERED_DEVICES: OnceLock<RwLock<HashMap<String, DeviceConnectionInfo>>> = OnceLock::new();
+static DISCOVERED_DEVICES: OnceLock<RwLock<HashMap<String, DeviceConnectionInfo>>> =
+    OnceLock::new();
 
 pub struct Discovery {
     pub ble_discovery_implementation: Option<Box<dyn BleDiscoveryImplementationDelegate>>,
-    discovery_delegate: Option<Arc<Mutex<Box<dyn DiscoveryDelegate>>>>
+    discovery_delegate: Option<Arc<Mutex<Box<dyn DiscoveryDelegate>>>>,
 }
 
 impl Discovery {
@@ -28,12 +29,12 @@ impl Discovery {
 
         let callback_arc = match delegate {
             Some(callback) => Some(Arc::new(Mutex::new(callback))),
-            None => None
+            None => None,
         };
 
         Ok(Self {
             ble_discovery_implementation: None,
-            discovery_delegate: callback_arc
+            discovery_delegate: callback_arc,
         })
     }
 
@@ -41,21 +42,36 @@ impl Discovery {
         let mut devices = vec![];
 
         for device in DISCOVERED_DEVICES.get().unwrap().read().unwrap().iter() {
-            devices.push(device.1.clone().device.expect("No device in DeviceConnectionInfo"));
+            devices.push(
+                device
+                    .1
+                    .clone()
+                    .device
+                    .expect("No device in DeviceConnectionInfo"),
+            );
         }
 
-        return devices
+        return devices;
     }
 
     pub fn get_connection_details(device: Device) -> Option<DeviceConnectionInfo> {
-        if DISCOVERED_DEVICES.get().unwrap().read().unwrap().contains_key(&device.id) {
+        if DISCOVERED_DEVICES
+            .get()
+            .unwrap()
+            .read()
+            .unwrap()
+            .contains_key(&device.id)
+        {
             return Some(DISCOVERED_DEVICES.get().unwrap().read().unwrap()[&device.id].clone());
         }
 
         return None;
     }
 
-    pub fn add_ble_implementation(&mut self, implementation: Box<dyn BleDiscoveryImplementationDelegate>) {
+    pub fn add_ble_implementation(
+        &mut self,
+        implementation: Box<dyn BleDiscoveryImplementationDelegate>,
+    ) {
         self.ble_discovery_implementation = Some(implementation)
     }
 
@@ -96,18 +112,42 @@ impl Discovery {
                     }
                 }
 
-                if DISCOVERED_DEVICES.get().unwrap().write().unwrap().contains_key(&device.id) {
-                    if !DISCOVERED_DEVICES.get().unwrap().write().unwrap().get(&device.id).unwrap().eq(&device_connection_info) {
+                if DISCOVERED_DEVICES
+                    .get()
+                    .unwrap()
+                    .write()
+                    .unwrap()
+                    .contains_key(&device.id)
+                {
+                    if !DISCOVERED_DEVICES
+                        .get()
+                        .unwrap()
+                        .write()
+                        .unwrap()
+                        .get(&device.id)
+                        .unwrap()
+                        .eq(&device_connection_info)
+                    {
                         self.add_discovered_device(device.clone());
                     }
                 } else {
                     self.add_discovered_device(device.clone());
                 }
 
-                DISCOVERED_DEVICES.get().unwrap().write().unwrap().insert(device.id.clone(), device_connection_info.clone());
+                DISCOVERED_DEVICES
+                    .get()
+                    .unwrap()
+                    .write()
+                    .unwrap()
+                    .insert(device.id.clone(), device_connection_info.clone());
             }
             Some(Content::OfflineDeviceId(device_id)) => {
-                DISCOVERED_DEVICES.get().unwrap().write().unwrap().remove(&device_id);
+                DISCOVERED_DEVICES
+                    .get()
+                    .unwrap()
+                    .write()
+                    .unwrap()
+                    .remove(&device_id);
                 self.remove_discovered_device(device_id);
             }
         };
@@ -115,13 +155,19 @@ impl Discovery {
 
     fn add_discovered_device(&self, device: Device) {
         if let Some(discovery_delegate) = &self.discovery_delegate {
-            discovery_delegate.lock().expect("Failed to lock discovery_delegate").device_added(device);
+            discovery_delegate
+                .lock()
+                .expect("Failed to lock discovery_delegate")
+                .device_added(device);
         }
     }
 
     fn remove_discovered_device(&self, device_id: String) {
         if let Some(discovery_delegate) = &self.discovery_delegate {
-            discovery_delegate.lock().expect("Failed to lock discovery_delegate").device_removed(device_id);
+            discovery_delegate
+                .lock()
+                .expect("Failed to lock discovery_delegate")
+                .device_removed(device_id);
         }
     }
 }

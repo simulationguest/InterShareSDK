@@ -1,17 +1,19 @@
 use std::collections::HashMap;
 use std::fmt::Debug;
-use std::{fs, thread};
-use std::fs::{File};
+use std::fs::File;
 use std::io::{Read, Write};
 use std::net::ToSocketAddrs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::{fs, thread};
 
 use local_ip_address::local_ip;
 use prost_stream::Stream;
-use protocol::communication::{FileTransferIntent, TransferRequest, TransferRequestResponse};
 use protocol::communication::transfer_request::Intent;
-use protocol::discovery::{BluetoothLeConnectionInfo, Device, DeviceConnectionInfo, TcpConnectionInfo};
+use protocol::communication::{FileTransferIntent, TransferRequest, TransferRequestResponse};
+use protocol::discovery::{
+    BluetoothLeConnectionInfo, Device, DeviceConnectionInfo, TcpConnectionInfo,
+};
 use tempfile::NamedTempFile;
 use tokio::sync::oneshot::{self, Sender};
 use tokio::sync::RwLock;
@@ -21,12 +23,12 @@ use zip::ZipWriter;
 
 use crate::communication::{initiate_receiver_communication, initiate_sender_communication};
 use crate::connection_request::ConnectionRequest;
-use crate::{convert_os_str, init_logger};
 use crate::discovery::Discovery;
 use crate::encryption::{EncryptedReadWrite, EncryptedStream};
 use crate::errors::ConnectErrors;
 use crate::stream::NativeStreamDelegate;
 use crate::transmission::tcp::{TcpClient, TcpServer};
+use crate::{convert_os_str, init_logger};
 
 pub trait BleServerImplementationDelegate: Send + Sync + Debug {
     fn start_server(&self);
@@ -39,12 +41,12 @@ pub trait L2CapDelegate: Send + Sync + Debug {
 
 pub enum ConnectionIntentType {
     FileTransfer,
-    Clipboard
+    Clipboard,
 }
 
 pub enum ConnectionMedium {
     BLE,
-    WiFi
+    WiFi,
 }
 
 pub enum SendProgressState {
@@ -56,7 +58,7 @@ pub enum SendProgressState {
     Transferring { progress: f64 },
     Cancelled,
     Finished,
-    Declined
+    Declined,
 }
 
 pub trait SendProgressDelegate: Send + Sync + Debug {
@@ -75,25 +77,29 @@ pub struct NearbyServerLockedVariables {
     nearby_connection_delegate: Option<Arc<std::sync::Mutex<Box<dyn NearbyConnectionDelegate>>>>,
     pub advertise: bool,
     file_storage: String,
-    l2cap_connections: HashMap<String, Sender<Box<dyn NativeStreamDelegate>>>
+    l2cap_connections: HashMap<String, Sender<Box<dyn NativeStreamDelegate>>>,
 }
 
 pub struct NearbyServer {
-    pub variables: Arc<RwLock<NearbyServerLockedVariables>>
+    pub variables: Arc<RwLock<NearbyServerLockedVariables>>,
 }
 
 impl NearbyServer {
-    pub fn new(my_device: Device, file_storage: String, delegate: Option<Box<dyn NearbyConnectionDelegate>>) -> Self {
+    pub fn new(
+        my_device: Device,
+        file_storage: String,
+        delegate: Option<Box<dyn NearbyConnectionDelegate>>,
+    ) -> Self {
         init_logger();
 
         let device_connection_info = DeviceConnectionInfo {
             device: Some(my_device.clone()),
             ble: None,
-            tcp: None
+            tcp: None,
         };
         let nearby_connection_delegate = match delegate {
             Some(d) => Some(Arc::new(std::sync::Mutex::new(d))),
-            None => None
+            None => None,
         };
 
         return Self {
@@ -105,8 +111,8 @@ impl NearbyServer {
                 nearby_connection_delegate,
                 advertise: false,
                 file_storage,
-                l2cap_connections: HashMap::new()
-            }))
+                l2cap_connections: HashMap::new(),
+            })),
         };
     }
 
@@ -114,12 +120,18 @@ impl NearbyServer {
         self.variables.blocking_write().ble_l2_cap_client = Some(delegate);
     }
 
-    pub fn add_bluetooth_implementation(&self, implementation: Box<dyn BleServerImplementationDelegate>) {
+    pub fn add_bluetooth_implementation(
+        &self,
+        implementation: Box<dyn BleServerImplementationDelegate>,
+    ) {
         self.variables.blocking_write().ble_server_implementation = Some(implementation)
     }
 
     pub fn change_device(&self, new_device: Device) {
-        self.variables.blocking_write().device_connection_info.device = Some(new_device);
+        self.variables
+            .blocking_write()
+            .device_connection_info
+            .device = Some(new_device);
     }
 
     pub fn set_bluetooth_le_details(&self, ble_info: BluetoothLeConnectionInfo) {
@@ -134,8 +146,7 @@ impl NearbyServer {
         let ip = local_ip();
         if let Ok(my_local_ip) = ip {
             return Some(my_local_ip.to_string());
-        }
-        else if let Err(error) = ip {
+        } else if let Err(error) = ip {
             println!("Unable to obtain IP address: {:?}", error);
         }
 
@@ -144,7 +155,12 @@ impl NearbyServer {
 
     pub async fn start(&self) {
         if self.variables.read().await.tcp_server.is_none() {
-            let delegate = self.variables.read().await.nearby_connection_delegate.clone();
+            let delegate = self
+                .variables
+                .read()
+                .await
+                .nearby_connection_delegate
+                .clone();
 
             let Some(delegate) = delegate else {
                 return;
@@ -162,10 +178,11 @@ impl NearbyServer {
 
                     tcp_server.start_loop();
 
-                    self.variables.write().await.device_connection_info.tcp = Some(TcpConnectionInfo {
-                        hostname: my_local_ip,
-                        port: tcp_server.port as u32,
-                    });
+                    self.variables.write().await.device_connection_info.tcp =
+                        Some(TcpConnectionInfo {
+                            hostname: my_local_ip,
+                            port: tcp_server.port as u32,
+                        });
 
                     self.variables.write().await.tcp_server = Some(tcp_server);
                 }
@@ -176,7 +193,9 @@ impl NearbyServer {
 
         self.variables.write().await.advertise = true;
 
-        if let Some(ble_advertisement_implementation) = &self.variables.read().await.ble_server_implementation {
+        if let Some(ble_advertisement_implementation) =
+            &self.variables.read().await.ble_server_implementation
+        {
             ble_advertisement_implementation.start_server();
         };
     }
@@ -186,27 +205,48 @@ impl NearbyServer {
         self.start().await;
     }
 
-    async fn initiate_sender<T>(&self, raw_stream: T) -> Result<EncryptedStream<T>, ConnectErrors> where T: Read + Write {
+    async fn initiate_sender<T>(&self, raw_stream: T) -> Result<EncryptedStream<T>, ConnectErrors>
+    where
+        T: Read + Write,
+    {
         return Ok(match initiate_sender_communication(raw_stream).await {
             Ok(stream) => stream,
-            Err(error) => return Err(ConnectErrors::FailedToEncryptStream { error: error.to_string() })
+            Err(error) => {
+                return Err(ConnectErrors::FailedToEncryptStream {
+                    error: error.to_string(),
+                })
+            }
         });
     }
 
-    pub fn handle_incoming_ble_connection(&self, connection_id: String, native_stream: Box<dyn NativeStreamDelegate>) {
-        let sender = self.variables.blocking_write().l2cap_connections.remove(&connection_id);
+    pub fn handle_incoming_ble_connection(
+        &self,
+        connection_id: String,
+        native_stream: Box<dyn NativeStreamDelegate>,
+    ) {
+        let sender = self
+            .variables
+            .blocking_write()
+            .l2cap_connections
+            .remove(&connection_id);
 
         if let Some(sender) = sender {
             let _ = sender.send(native_stream);
         }
     }
 
-    async fn connect_tcp(&self, connection_details: &DeviceConnectionInfo) -> Result<Box<dyn EncryptedReadWrite>, ConnectErrors> {
+    async fn connect_tcp(
+        &self,
+        connection_details: &DeviceConnectionInfo,
+    ) -> Result<Box<dyn EncryptedReadWrite>, ConnectErrors> {
         let Some(tcp_connection_details) = &connection_details.tcp else {
             return Err(ConnectErrors::FailedToGetTcpDetails);
         };
 
-        let socket_string = format!("{0}:{1}", tcp_connection_details.hostname, tcp_connection_details.port);
+        let socket_string = format!(
+            "{0}:{1}",
+            tcp_connection_details.hostname, tcp_connection_details.port
+        );
         println!("{:?}", socket_string);
 
         let socket_address = socket_string.to_socket_addrs();
@@ -230,7 +270,11 @@ impl NearbyServer {
         return Err(ConnectErrors::FailedToOpenTcpStream);
     }
 
-    async fn connect(&self, device: Device, progress_delegate: &Option<Box<dyn SendProgressDelegate>>) -> Result<Box<dyn EncryptedReadWrite>, ConnectErrors> {
+    async fn connect(
+        &self,
+        device: Device,
+        progress_delegate: &Option<Box<dyn SendProgressDelegate>>,
+    ) -> Result<Box<dyn EncryptedReadWrite>, ConnectErrors> {
         let Some(connection_details) = Discovery::get_connection_details(device) else {
             return Err(ConnectErrors::FailedToGetConnectionDetails);
         };
@@ -238,7 +282,12 @@ impl NearbyServer {
         let encrypted_stream = self.connect_tcp(&connection_details).await;
 
         if let Ok(encrypted_stream) = encrypted_stream {
-            NearbyServer::update_progress(&progress_delegate, SendProgressState::ConnectionMediumUpdate { medium: ConnectionMedium::WiFi });
+            NearbyServer::update_progress(
+                &progress_delegate,
+                SendProgressState::ConnectionMediumUpdate {
+                    medium: ConnectionMedium::WiFi,
+                },
+            );
 
             return Ok(encrypted_stream);
         }
@@ -255,10 +304,18 @@ impl NearbyServer {
         let id = Uuid::new_v4().to_string();
         let (sender, receiver) = oneshot::channel::<Box<dyn NativeStreamDelegate>>();
 
-        self.variables.write().await.l2cap_connections.insert(id.clone(), sender);
+        self.variables
+            .write()
+            .await
+            .l2cap_connections
+            .insert(id.clone(), sender);
 
         if let Some(ble_l2cap_client) = &self.variables.read().await.ble_l2_cap_client {
-            ble_l2cap_client.open_l2cap_connection(id.clone(), ble_connection_details.uuid.clone(), ble_connection_details.psm);
+            ble_l2cap_client.open_l2cap_connection(
+                id.clone(),
+                ble_connection_details.uuid.clone(),
+                ble_connection_details.psm,
+            );
         } else {
             return Err(ConnectErrors::InternalBleHandlerNotAvailable);
         }
@@ -270,12 +327,20 @@ impl NearbyServer {
         };
 
         let encrypted_stream = self.initiate_sender(connection).await?;
-        NearbyServer::update_progress(&progress_delegate, SendProgressState::ConnectionMediumUpdate { medium: ConnectionMedium::BLE });
+        NearbyServer::update_progress(
+            &progress_delegate,
+            SendProgressState::ConnectionMediumUpdate {
+                medium: ConnectionMedium::BLE,
+            },
+        );
 
         return Ok(Box::new(encrypted_stream));
     }
 
-    fn update_progress(progress_delegate: &Option<Box<dyn SendProgressDelegate>>, state: SendProgressState) {
+    fn update_progress(
+        progress_delegate: &Option<Box<dyn SendProgressDelegate>>,
+        state: SendProgressState,
+    ) {
         if let Some(progress_delegate) = progress_delegate {
             progress_delegate.progress_changed(state);
         }
@@ -289,7 +354,8 @@ impl NearbyServer {
             return;
         };
 
-        let directory_name = convert_os_str(&directory_name).expect("Failed to convert OSString to String");
+        let directory_name =
+            convert_os_str(&directory_name).expect("Failed to convert OSString to String");
         let combined_path = PathBuf::from(prefix).join(directory_name);
         let dir_name = combined_path.to_str().unwrap();
 
@@ -309,7 +375,10 @@ impl NearbyServer {
                 let file_name = path.file_name().expect("Could not read file name");
                 let zip_file_path = path.join(file_name);
 
-                let _ = zip.start_file(zip_file_path.to_str().unwrap(), SimpleFileOptions::default());
+                let _ = zip.start_file(
+                    zip_file_path.to_str().unwrap(),
+                    SimpleFileOptions::default(),
+                );
 
                 let mut file = File::open(path).unwrap();
                 let _ = std::io::copy(&mut file, zip);
@@ -322,12 +391,17 @@ impl NearbyServer {
         }
     }
 
-    pub async fn send_files(&self, receiver: Device, file_paths: Vec<String>, progress_delegate: Option<Box<dyn SendProgressDelegate>>) -> Result<(), ConnectErrors> {
+    pub async fn send_files(
+        &self,
+        receiver: Device,
+        file_paths: Vec<String>,
+        progress_delegate: Option<Box<dyn SendProgressDelegate>>,
+    ) -> Result<(), ConnectErrors> {
         NearbyServer::update_progress(&progress_delegate, SendProgressState::Connecting);
 
         let mut encrypted_stream = match self.connect(receiver, &progress_delegate).await {
             Ok(connection) => connection,
-            Err(error) => return Err(error)
+            Err(error) => return Err(error),
         };
 
         let mut proto_stream = Stream::new(&mut encrypted_stream);
@@ -345,8 +419,11 @@ impl NearbyServer {
                 self.zip_directory(&mut zip, "".to_string(), &file_path);
             } else {
                 println!("Compressing file: {:?}", file);
-                zip.start_file(convert_os_str(file.file_name().unwrap()).unwrap(), SimpleFileOptions::default())
-                    .unwrap();
+                zip.start_file(
+                    convert_os_str(file.file_name().unwrap()).unwrap(),
+                    SimpleFileOptions::default(),
+                )
+                .unwrap();
 
                 let mut file = File::open(file_path).unwrap();
                 let _ = std::io::copy(&mut file, &mut zip);
@@ -355,7 +432,8 @@ impl NearbyServer {
 
         let zip_result = zip.finish().expect("Failed to finish the ZIP");
 
-        let file_size = zip_result.metadata()
+        let file_size = zip_result
+            .metadata()
             .expect("Failed to retrieve metadata from ZIP")
             .len();
 
@@ -366,26 +444,39 @@ impl NearbyServer {
         let file_name = {
             if file_paths.len() == 1 {
                 let path = Path::new(file_paths.first().unwrap());
-                Some(convert_os_str(path.file_name().expect("Failed to get file name")).expect("Failed to parse OS String"))
+                Some(
+                    convert_os_str(path.file_name().expect("Failed to get file name"))
+                        .expect("Failed to parse OS String"),
+                )
             } else {
                 None
             }
         };
 
         let transfer_request = TransferRequest {
-            device: self.variables.read().await.device_connection_info.device.clone(),
+            device: self
+                .variables
+                .read()
+                .await
+                .device_connection_info
+                .device
+                .clone(),
             intent: Some(Intent::FileTransfer(FileTransferIntent {
                 file_name,
                 file_size,
-                file_count: file_paths.len() as u64
-            }))
+                file_count: file_paths.len() as u64,
+            })),
         };
 
         let _ = proto_stream.send(&transfer_request);
 
         let response = match proto_stream.recv::<TransferRequestResponse>() {
             Ok(message) => message,
-            Err(error) => return Err(ConnectErrors::FailedToGetTransferRequestResponse { error: error.to_string() })
+            Err(error) => {
+                return Err(ConnectErrors::FailedToGetTransferRequestResponse {
+                    error: error.to_string(),
+                })
+            }
         };
 
         if !response.accepted {
@@ -395,7 +486,10 @@ impl NearbyServer {
 
         let mut buffer = [0; 1024];
 
-        NearbyServer::update_progress(&progress_delegate, SendProgressState::Transferring { progress: 0.0 });
+        NearbyServer::update_progress(
+            &progress_delegate,
+            SendProgressState::Transferring { progress: 0.0 },
+        );
 
         let mut all_written: usize = 0;
 
@@ -404,7 +498,8 @@ impl NearbyServer {
                 break;
             }
 
-            let written_bytes = encrypted_stream.write(&buffer[..read_size])
+            let written_bytes = encrypted_stream
+                .write(&buffer[..read_size])
                 .expect("Failed to write file buffer");
 
             if written_bytes <= 0 {
@@ -413,7 +508,12 @@ impl NearbyServer {
 
             all_written += written_bytes;
 
-            NearbyServer::update_progress(&progress_delegate, SendProgressState::Transferring { progress: (all_written as f64 / file_size as f64) });
+            NearbyServer::update_progress(
+                &progress_delegate,
+                SendProgressState::Transferring {
+                    progress: (all_written as f64 / file_size as f64),
+                },
+            );
         }
 
         let _ = tmp_file.close();
@@ -428,7 +528,11 @@ impl NearbyServer {
     }
 
     pub fn handle_incoming_connection(&self, native_stream_handle: Box<dyn NativeStreamDelegate>) {
-        let delegate = self.variables.blocking_read().nearby_connection_delegate.clone();
+        let delegate = self
+            .variables
+            .blocking_read()
+            .nearby_connection_delegate
+            .clone();
 
         let Some(delegate) = delegate else {
             return;
@@ -457,10 +561,13 @@ impl NearbyServer {
             let connection_request = ConnectionRequest::new(
                 transfer_request,
                 Box::new(encrypted_stream),
-                file_storage.clone()
+                file_storage.clone(),
             );
 
-            delegate.lock().expect("Failed to lock delegate").received_connection_request(Arc::new(connection_request));
+            delegate
+                .lock()
+                .expect("Failed to lock delegate")
+                .received_connection_request(Arc::new(connection_request));
         });
     }
 
@@ -468,7 +575,9 @@ impl NearbyServer {
         self.variables.blocking_write().advertise = false;
         self.variables.blocking_write().tcp_server = None;
 
-        if let Some(ble_advertisement_implementation) = &self.variables.blocking_read().ble_server_implementation {
+        if let Some(ble_advertisement_implementation) =
+            &self.variables.blocking_read().ble_server_implementation
+        {
             ble_advertisement_implementation.stop_server();
         }
     }
