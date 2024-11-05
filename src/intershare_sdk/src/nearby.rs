@@ -97,10 +97,8 @@ impl NearbyServer {
             ble: None,
             tcp: None,
         };
-        let nearby_connection_delegate = match delegate {
-            Some(d) => Some(Arc::new(std::sync::Mutex::new(d))),
-            None => None,
-        };
+
+        let nearby_connection_delegate = delegate.map(|d| Arc::new(std::sync::Mutex::new(d)));
 
         return Self {
             variables: Arc::new(RwLock::new(NearbyServerLockedVariables {
@@ -256,7 +254,7 @@ impl NearbyServer {
             return Err(ConnectErrors::FailedToGetSocketAddress);
         };
 
-        let mut socket_address = socket_address.as_slice()[0].clone();
+        let mut socket_address = socket_address.as_slice()[0];
         socket_address.set_port(tcp_connection_details.port as u16);
 
         let tcp_stream = TcpClient::connect(socket_address);
@@ -283,7 +281,7 @@ impl NearbyServer {
 
         if let Ok(encrypted_stream) = encrypted_stream {
             NearbyServer::update_progress(
-                &progress_delegate,
+                progress_delegate,
                 SendProgressState::ConnectionMediumUpdate {
                     medium: ConnectionMedium::WiFi,
                 },
@@ -328,7 +326,7 @@ impl NearbyServer {
 
         let encrypted_stream = self.initiate_sender(connection).await?;
         NearbyServer::update_progress(
-            &progress_delegate,
+            progress_delegate,
             SendProgressState::ConnectionMediumUpdate {
                 medium: ConnectionMedium::BLE,
             },
@@ -355,7 +353,7 @@ impl NearbyServer {
         };
 
         let directory_name =
-            convert_os_str(&directory_name).expect("Failed to convert OSString to String");
+            convert_os_str(directory_name).expect("Failed to convert OSString to String");
         let combined_path = PathBuf::from(prefix).join(directory_name);
         let dir_name = combined_path.to_str().unwrap();
 
@@ -416,7 +414,7 @@ impl NearbyServer {
             let file = Path::new(file_path);
 
             if file.is_dir() {
-                self.zip_directory(&mut zip, "".to_string(), &file_path);
+                self.zip_directory(&mut zip, "".to_string(), file_path);
             } else {
                 println!("Compressing file: {:?}", file);
                 zip.start_file(
@@ -502,7 +500,7 @@ impl NearbyServer {
                 .write(&buffer[..read_size])
                 .expect("Failed to write file buffer");
 
-            if written_bytes <= 0 {
+            if written_bytes == 0 {
                 break;
             }
 

@@ -27,10 +27,7 @@ impl Discovery {
 
         DISCOVERED_DEVICES.get_or_init(|| RwLock::new(HashMap::new()));
 
-        let callback_arc = match delegate {
-            Some(callback) => Some(Arc::new(Mutex::new(callback))),
-            None => None,
-        };
+        let callback_arc = delegate.map(|callback| Arc::new(Mutex::new(callback)));
 
         Ok(Self {
             ble_discovery_implementation: None,

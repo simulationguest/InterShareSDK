@@ -6,6 +6,9 @@ edition = "2021"
 [lib]
 crate-type = ["lib", "staticlib", "cdylib"]
 
+[lints]
+workspace = true
+
 [[bin]]
 name = "uniffi-bindgen"
 path = "uniffi-bindgen.rs"

@@ -53,7 +53,7 @@ where
             .read(&mut buffer)
             .expect("Failed to read from encrypted buffer");
 
-        if read_bytes <= 0 {
+        if read_bytes == 0 {
             return Ok(0);
         }
 

@@ -10,3 +10,6 @@ members = [
 exclude = [
     "src/intershare_windows"
 ]
+
+[workspace.lints.clippy]
+needless_return = "allow"
